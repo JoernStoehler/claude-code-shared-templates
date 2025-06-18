@@ -32,7 +32,7 @@ To disable telemetry, exclude the `claude-code-telemetry` feature from your devc
 
 Claude Code configuration is stored in:
 ```
-$CLAUDE_CONFIG_DIR=/workspaces/{project}/.devcontainer/.claude-config
+$CLAUDE_CONFIG_DIR=/workspaces/.claude-config
 ```
 
 This directory persists:

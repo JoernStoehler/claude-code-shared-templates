@@ -1,37 +1,30 @@
 {
   "name": "Universal Template (Codespaces)",
+  // Codespaces uses its own base image by default
   // "image": "mcr.microsoft.com/devcontainers/universal:2",
 
   // Features to add to the dev container
   "features": {
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code:1": {},
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-telemetry:1": {},
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-common-cli-tools:1": {},
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-shared-templates-git-remote:1": {
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code:3": {},
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-common-cli-tools:3": {},
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-shared-templates-git-remote:3": {
       "templateUrl": "https://github.com/JoernStoehler/claude-code-shared-templates.git"
-    }
+    },
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-telemetry:3": {},
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-env-loader:3": {}
   },
 
   // No volume mounts in Codespaces (volumes are deleted on rebuild)
 
-  // Run the setup script after container creation
-  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+  // Install Python dependencies after container creation
+  "postCreateCommand": "uv sync --frozen --all-extras --dev || uv sync --all-extras --dev",
 
-  // Ensure bash loads our environment
-  "remoteEnv": {
-    "BASH_ENV": "/home/codespace/.bashrc",
-    "UV_PROJECT_ENVIRONMENT": "/home/codespace/.venv",
-    "CLAUDE_CONFIG_DIR": "/workspaces/claude-code-shared-templates/.devcontainer/.claude-config"
-  },
+  // Environment setup handled by features and postCreateCommand
 
   // VS Code extensions and settings
   "customizations": {
     "codespaces": {
-      "repositories": {
-        "JoernStoehler/claude-universal-docs": {
-          "permissions": "write-all"
-        }
-      }
+      // Repository permissions can be added here if needed
     },
     "vscode": {
       "extensions": [
