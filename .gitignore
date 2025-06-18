@@ -44,7 +44,6 @@ dmypy.json
 .ruff_cache/
 htmlcov/
 .python-version
-uv.lock
 
 # TypeScript / JavaScript
 node_modules/
