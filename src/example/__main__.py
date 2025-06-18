@@ -14,7 +14,7 @@ def main():
     # Example multiplication
     mult_request = CalculationRequest(operation="multiply", operand_a=4, operand_b=7)
     mult_result = process_calculation(mult_request)
-    print(f"Multiplication: {mult_result.operand_a} × {mult_result.operand_b} = {mult_result.result}")
+    print(f"Multiplication: {mult_result.operand_a} x {mult_result.operand_b} = {mult_result.result}")
 
 
 if __name__ == "__main__":
