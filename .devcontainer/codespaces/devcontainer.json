@@ -1,0 +1,68 @@
+{
+  "name": "Universal Template (Codespaces)",
+  // "image": "mcr.microsoft.com/devcontainers/universal:2",
+
+  // Features to add to the dev container
+  "features": {
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code:1": {},
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-telemetry:1": {},
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-common-cli-tools:1": {},
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-shared-templates-git-remote:1": {
+      "templateUrl": "https://github.com/JoernStoehler/claude-code-shared-templates.git"
+    }
+  },
+
+  // No volume mounts in Codespaces (volumes are deleted on rebuild)
+
+  // Run the setup script after container creation
+  "postCreateCommand": "bash .devcontainer/postCreateCommand.sh",
+
+  // Ensure bash loads our environment
+  "remoteEnv": {
+    "BASH_ENV": "/home/codespace/.bashrc",
+    "UV_PROJECT_ENVIRONMENT": "/home/codespace/.venv",
+    "CLAUDE_CONFIG_DIR": "/workspaces/claude-code-shared-templates/.devcontainer/.claude-config"
+  },
+
+  // VS Code extensions and settings
+  "customizations": {
+    "codespaces": {
+      "repositories": {
+        "JoernStoehler/claude-universal-docs": {
+          "permissions": "write-all"
+        }
+      }
+    },
+    "vscode": {
+      "extensions": [
+        // Core development
+        "Anthropic.claude-code",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "ms-vscode.vscode-websearchforcopilot",
+        
+        // Python (optional, for Python projects)
+        "ms-python.python",
+        "ms-toolsai.jupyter",
+        "ms-python.vscode-pylance",
+        "charliermarsh.ruff",
+        
+        // TypeScript/JavaScript (optional, for TS/JS projects)
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        
+        // Git and GitHub
+        "github.vscode-github-actions",
+        "GitHub.vscode-pull-request-github",
+        
+        // General productivity
+        "redhat.vscode-yaml",
+        "tamasfe.even-better-toml",
+        "mechatroner.rainbow-csv",
+        "usernamehw.errorlens",
+        "ms-vscode.vscode-loc-en"
+      ],
+      "settings": {}
+    }
+  }
+}
