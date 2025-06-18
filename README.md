@@ -1,158 +1,78 @@
-# Claude Code Shared Templates
+# KI in der Mathematik - Seminar Materials
 
-A comprehensive project template for Claude Code development, featuring modern Python tooling, devcontainer support, and best practices documentation.
+This repository contains materials and infrastructure for the "KI in der Mathematik" (AI in Mathematics) seminar at the University of Augsburg, Summer Semester 2025.
 
-## Quick Start
+## Overview
 
-### Use as a Template
+This seminar explores the intersection of artificial intelligence and mathematics through two main components:
 
-1. Click "Use this template" on GitHub
-2. Create a new repository
-3. Open in VS Code with devcontainers or GitHub Codespaces
-4. Start developing!
+### 1. Research Component: Mathematical Theory and AI
+- Deep dive into 1-3 research papers on AI applications in mathematics
+- Collaborative preparation with a teammate
+- Creation of presentation slides and accompanying notes
+- Development of visual aids (animated knot transformations, graphs, mathematical visualizations)
 
-### Features
+### 2. Practical Component: AI-Assisted Problem Solving
+- Block seminar on using Claude Code and other AI tools
+- Benchmark testing on Analysis 1-3 exercise sheets
+- Prompt engineering training and experimentation
+- Development of personal prompt libraries and benchmarking infrastructure
 
-- **Pre-configured Development Environment**
-  - Dual devcontainer profiles (local and Codespaces)
-  - Claude Code CLI integration
-  - Modern Python tooling (uv, ruff, pyright, pytest)
-  - Essential development tools (ripgrep, fd, bat, etc.)
-
-- **Template Synchronization**
-  - Bidirectional sync between template and derived projects
-  - Cherry-pick improvements back to template
-  - Keep projects up-to-date with template enhancements
-
-- **Comprehensive Documentation**
-  - Claude Code principles and workflows
-  - Task management templates
-  - Coding standards and style guides
-  - Environment setup guides
-
-## Project Structure
+## Repository Structure
 
 ```
-├── .devcontainer/          # Devcontainer configurations
-│   ├── local/             # Local development profile
-│   └── codespaces/        # GitHub Codespaces profile
-├── docs/                  # Documentation
-│   └── claude/           # Claude Code specific docs
-├── example/              # Example Python module
-├── scripts/              # Utility scripts
-│   └── ps-monitor/       # Process monitoring tool
-├── tests/                # Test suite
-├── CLAUDE.md            # Claude Code entry point
-├── pyproject.toml       # Python project configuration
-└── Makefile             # Development commands
+seminar-ki-in-der-mathematik/
+├── research/              # Research paper analysis and presentation materials
+│   ├── papers/           # Paper summaries and notes
+│   ├── slides/           # Presentation slides
+│   └── media/            # Visualizations and animations
+├── practical/            # Practical AI benchmarking component
+│   ├── exercises/        # Analysis 1-3 exercise sheets (LaTeX)
+│   ├── prompts/          # Personal prompt library
+│   ├── benchmarks/       # Benchmarking results and analysis
+│   └── tools/            # Helper scripts and utilities
+├── notes/                # General notes and reflections
+│   ├── ai-overview/      # Overview of modern AI capabilities
+│   ├── techniques/       # Prompt engineering techniques
+│   └── reflections/      # Post-seminar reflections
+└── src/                  # Python source code
+    └── seminar/          # Main package for tools and utilities
 ```
 
-## Devcontainer Features
+## Setup
 
-This template uses modular devcontainer features from [claude-code-devcontainer-features](https://github.com/JoernStoehler/claude-code-devcontainer-features):
+This project uses modern Python tooling with development containers for consistent environments.
 
-- **claude-code**: Installs Claude CLI and configuration
-- **claude-code-telemetry**: OpenTelemetry setup (optional)
-- **claude-code-common-cli-tools**: Development tools and git config
-- **claude-code-shared-templates-git-remote**: Template sync setup
+### Quick Start (GitHub Codespaces)
+1. Click "Code" → "Create codespace on main"
+2. Wait for the environment to initialize
+3. All dependencies will be automatically installed
+
+### Local Development
+1. Install VS Code with Dev Containers extension
+2. Clone the repository
+3. Open in VS Code and select "Reopen in Container"
+4. Run `make install` to set up dependencies
+
+## Key Technologies
+
+- **Presentation**: Manim for mathematical animations, Jupyter for interactive demos
+- **AI Integration**: Claude Code, OpenAI API, Anthropic API
+- **Data Analysis**: Polars/Pandas for benchmark analysis
+- **Documentation**: Jupyter notebooks, Markdown, LaTeX
 
 ## Development Workflow
 
-### Common Commands
+See the [development documentation](docs/claude/development/00-principles.md) for detailed guidelines on:
+- Code style and architecture
+- Testing practices
+- Documentation standards
+- Git workflow
 
-```bash
-# Install dependencies
-make install
+## Contact
 
-# Run tests
-make test
-
-# Type checking
-make typecheck
-
-# Linting
-make lint
-
-# Start development server
-make dev
-```
-
-### Git Workflow
-
-```bash
-# Create feature branch
-git checkout -b feat/new-feature
-
-# Make changes and commit
-git add -A
-git commit -m "feat: add new feature"
-
-# Create pull request
-gh pr create
-```
-
-### Template Synchronization
-
-```bash
-# Fetch latest template updates
-git fetch template
-
-# Merge template changes
-git merge template/main
-
-# Cherry-pick specific improvements
-git cherry-pick <commit-hash>
-```
-
-## Contributing
-
-### To This Template
-
-1. Fork this repository
-2. Create a feature branch
-3. Make your improvements
-4. Submit a pull request
-
-Good candidates for template contributions:
-- Claude Code workflow improvements
-- Devcontainer enhancements
-- General utility scripts
-- Documentation improvements
-
-### From Derived Projects
-
-When you've made improvements in your project that would benefit others:
-
-```bash
-# Create branch from template
-git checkout -b template-improvement template/main
-
-# Cherry-pick your improvements
-git cherry-pick <your-commits>
-
-# Push to your fork and create PR
-```
-
-## Documentation
-
-Key documentation files:
-- `CLAUDE.md` - Claude Code entry point
-- `docs/claude/` - Comprehensive guides:
-  - Development principles
-  - Environment setup
-  - Workflows (tasks, PRs, template sync)
-  - Coding standards
-  - Documentation standards
+Jörn Stöhler - MSc Mathematics Student, University of Augsburg
 
 ## License
 
-MIT License - see LICENSE file for details.
-
-## Maintainer
-
-**Jörn Stöhler** - Project owner and primary maintainer
-
-## Related Projects
-
-- [claude-code-devcontainer-features](https://github.com/JoernStoehler/claude-code-devcontainer-features) - Devcontainer features used by this template
-- [template-universal](https://github.com/JoernStoehler/template-universal) - Original monolithic template (deprecated)
+This is an academic project. Materials are shared for educational purposes.

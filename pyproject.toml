@@ -1,26 +1,37 @@
 [project]
-name = "claude-code-shared-templates"
+name = "seminar-ki-in-der-mathematik"
 version = "0.1.0"
-description = "A template for scientific computing projects using modern Python tooling"
+description = "Materials and infrastructure for 'KI in der Mathematik' seminar - MSc Mathematics, University of Augsburg, SS2025"
 authors = [
     { name = "Jörn Stöhler", email = "your-email@example.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    # Main runtime dependencies
-    "numpyro>=0.13.0",
-    "jax>=0.4.0",
-    "jaxlib>=0.4.0",
-    "optax>=0.1.0",
-    "jaxtyping>=0.2.0",
-    "pydantic>=2.0.0",
-    "polars>=0.20.0",
-    "fastapi>=0.100.0",
+    # Presentation and visualization
     "matplotlib>=3.7.0",
-    # Utility runtime dependencies
+    "plotly>=5.18.0",
+    "manim>=0.18.0",  # For mathematical animations
+    
+    # Document processing and presentations
+    "jupyterlab>=4.0.0",
+    "quarto>=1.4",
+    
+    # Data analysis and benchmarking
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    
+    # AI/ML tools for benchmarking
+    "openai>=1.0.0",
+    "anthropic>=0.21.0",
+    "langchain>=0.1.0",
+    
+    # Utilities
+    "pydantic>=2.0.0",
     "httpx>=0.25.0",
     "tqdm>=4.66.0",
+    "click>=8.1.0",
+    "rich>=13.0.0",
 ]
 
 [project.optional-dependencies]
@@ -31,12 +42,9 @@ dev = [
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
     "pytest-xdist>=3.3.0",
-    "uvicorn>=0.24.0",
     "pre-commit>=3.5.0",
     # ps-monitor dependencies
     "psutil>=5.9.0",
-    "rich>=13.0.0",
-    "click>=8.1.0",
 ]
 
 [build-system]
@@ -47,7 +55,7 @@ build-backend = "hatchling.build"
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/example"]
+packages = ["src/seminar"]
 
 # Ruff configuration - minimal rules focused on bug prevention
 [tool.ruff]
@@ -81,7 +89,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["example"]
+known-first-party = ["seminar"]
 
 # Pyright configuration - standard mode
 [tool.pyright]
@@ -140,7 +148,7 @@ addopts = [
     "-v",
     "--strict-markers",
     "--strict-config",
-    "--cov=src/example",
+    "--cov=src/seminar",
     "--cov-branch",
     "--cov-report=term-missing:skip-covered",
     "--cov-report=html",
@@ -153,7 +161,7 @@ python_functions = ["test_*"]
 
 # Coverage configuration
 [tool.coverage.run]
-source = ["src/example"]
+source = ["src/seminar"]
 branch = true
 omit = [
     "*/tests/*",

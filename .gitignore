@@ -102,6 +102,7 @@ desktop.ini
 
 # Claude Code
 .claude/settings.local.json
+.claude-config/
 .devcontainer/.claude-config/
 scratchpad/*
 !scratchpad/.gitkeep
