@@ -1,0 +1,46 @@
+{
+  "files.associations": {
+    "**/devcontainer*.json": "jsonc",
+    ".devcontainer/devcontainer*.json": "jsonc",
+    ".devcontainer.json": "jsonc"
+  },
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "**/devcontainer*.json",
+        ".devcontainer/devcontainer*.json",
+        ".devcontainer.json"
+      ],
+      "url": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainer.schema.json"
+    }
+  ],
+  
+  // General settings
+  "locale": "en",
+  "files.autoSave": "onFocusChange",
+  "editor.rulers": [88, 100],
+  
+  // Python settings (for Python projects)
+  "python.defaultInterpreterPath": "/home/codespace/.venv/bin/python",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["tests"],
+  "python.linting.enabled": false,
+  "python.formatting.provider": "none",
+  "[python]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "never",
+      "source.organizeImports.ruff": "never"
+    }
+  },
+  "ruff.nativeServer": true,
+  
+  // TypeScript/JavaScript settings (for TS/JS projects)
+  "[typescript]": {
+    "editor.formatOnSave": false
+  },
+  "[javascript]": {
+    "editor.formatOnSave": false
+  },
+  "makefile.configureOnOpen": false
+}

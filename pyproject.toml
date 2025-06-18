@@ -1,0 +1,181 @@
+[project]
+name = "claude-code-shared-templates"
+version = "0.1.0"
+description = "A template for scientific computing projects using modern Python tooling"
+authors = [
+    { name = "Jörn Stöhler", email = "your-email@example.com" }
+]
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    # Main runtime dependencies
+    "numpyro>=0.13.0",
+    "jax>=0.4.0",
+    "jaxlib>=0.4.0",
+    "optax>=0.1.0",
+    "jaxtyping>=0.2.0",
+    "pydantic>=2.0.0",
+    "polars>=0.20.0",
+    "fastapi>=0.100.0",
+    "matplotlib>=3.7.0",
+    # Utility runtime dependencies
+    "httpx>=0.25.0",
+    "tqdm>=4.66.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    # Development dependencies
+    "ruff>=0.1.0",
+    "pyright>=1.1.350",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "pytest-xdist>=3.3.0",
+    "uvicorn>=0.24.0",
+    "pre-commit>=3.5.0",
+    # ps-monitor dependencies
+    "psutil>=5.9.0",
+    "rich>=13.0.0",
+    "click>=8.1.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["example"]
+
+# Ruff configuration - minimal rules focused on bug prevention
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [
+    ".git",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "__pycache__",
+    "build",
+    "dist",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",     # pycodestyle errors
+    "F",     # pyflakes
+    "I",     # isort
+    "UP",    # pyupgrade
+    "B",     # flake8-bugbear
+    "SIM",   # flake8-simplify
+    "RUF",   # ruff-specific rules
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+    "B008",  # do not perform function calls in argument defaults
+    "B904",  # raise from None
+    "SIM105", # use contextlib.suppress
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["example"]
+
+# Pyright configuration - standard mode
+[tool.pyright]
+include = ["example", "tests", "scripts"]
+exclude = [
+    "**/__pycache__",
+    ".venv",
+    "venv",
+    ".git",
+    "build",
+    "dist",
+]
+typeCheckingMode = "standard"
+pythonVersion = "3.11"
+reportMissingImports = true
+reportMissingTypeStubs = false
+reportUnknownArgumentType = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportGeneralTypeIssues = true
+reportOptionalMemberAccess = true
+reportOptionalCall = true
+reportOptionalIterable = true
+reportOptionalContextManager = true
+reportOptionalOperand = true
+reportTypedDictNotRequiredAccess = true
+reportPrivateImportUsage = true
+reportConstantRedefinition = true
+reportIncompatibleMethodOverride = true
+reportIncompatibleVariableOverride = true
+reportInconsistentConstructor = true
+reportOverlappingOverload = true
+reportUninitializedInstanceVariable = true
+reportCallInDefaultInitializer = true
+reportUnnecessaryIsInstance = true
+reportUnnecessaryCast = true
+reportUnnecessaryComparison = true
+reportUnnecessaryContains = true
+reportAssertAlwaysTrue = true
+reportSelfClsParameterName = true
+reportUnusedClass = true
+reportUnusedImport = true
+reportUnusedFunction = true
+reportUnusedVariable = true
+reportDuplicateImport = true
+reportWildcardImportFromLibrary = true
+reportOptionalSubscript = true
+reportPrivateUsage = true
+reportUnboundVariable = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=example",
+    "--cov-branch",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=html",
+    "--cov-report=xml",
+    "--cov-fail-under=80",
+]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+# Coverage configuration
+[tool.coverage.run]
+source = ["example"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
