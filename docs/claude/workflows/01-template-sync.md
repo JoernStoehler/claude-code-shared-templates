@@ -6,9 +6,12 @@ The template synchronization system enables bidirectional flow of improvements b
 
 ## Setup
 
-The `claude-template-remote` devcontainer feature automatically configures the template repository as a git remote:
+To enable template synchronization, you'll need to manually add the template repository as a git remote:
 
 ```bash
+# Add template remote
+git remote add template https://github.com/JoernStoehler/claude-code-shared-templates.git
+
 # Verify template remote exists
 git remote -v
 
@@ -18,6 +21,8 @@ git remote -v
 # template  https://github.com/JoernStoehler/claude-code-shared-templates.git (fetch)
 # template  https://github.com/JoernStoehler/claude-code-shared-templates.git (push)
 ```
+
+**Note**: This was previously handled by a devcontainer feature but is now a manual step to give you more control over template synchronization.
 
 ## Common Sync Workflows
 
@@ -74,10 +79,11 @@ When you've made improvements that would benefit other projects:
 
 Good candidates for template contribution:
 - Claude Code workflow improvements
-- Devcontainer enhancements  
+- Devcontainer setup scripts in `.devcontainer/postCreateCommand/`
 - General utility scripts (like @scripts/ps-monitor/ps-monitor.py)
 - Documentation improvements
 - Bug fixes in template code
+- Environment setup improvements
 
 Not suitable for template:
 - Project-specific business logic
@@ -155,7 +161,7 @@ git merge template/main --allow-unrelated-histories
 Consider manual file-by-file comparison rather than full merge
 
 ### Template remote missing
-The `claude-template-remote` feature should add it automatically, but manually:
+Add it manually:
 ```bash
 git remote add template https://github.com/JoernStoehler/claude-code-shared-templates.git
 ```

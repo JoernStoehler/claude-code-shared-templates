@@ -3,20 +3,12 @@
   // Codespaces uses its own base image by default
   // "image": "mcr.microsoft.com/devcontainers/universal:2",
 
-  // Features to add to the dev container
-  "features": {
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code:5": {
-      "enableTelemetry": true,
-      "templateUrl": "https://github.com/JoernStoehler/claude-code-shared-templates.git"
-    }
-  },
-
   // No volume mounts in Codespaces (volumes are deleted on rebuild)
 
-  // Install UV and Python dependencies after container creation
-  "postCreateCommand": ".devcontainer/setup-dependencies.sh",
+  // Run all scripts in postCreateCommand directory in order
+  "postCreateCommand": "for script in .devcontainer/postCreateCommand/*.sh; do echo \"Running $script...\"; bash \"$script\" || exit 1; done",
 
-  // Environment setup handled by features and postCreateCommand
+  // Environment setup handled by postCreateCommand scripts
 
   // VS Code extensions and settings
   "customizations": {

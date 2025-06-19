@@ -11,17 +11,34 @@ This directory contains documentation about the development environment setup an
 
 The development environment is pre-configured with:
 - Devcontainer support for both local and GitHub Codespaces
+- Script-based setup in `.devcontainer/postCreateCommand/`
 - Claude Code CLI and development tools
 - Git worktrees for branch-based development
 - Python environment with uv package manager
 - Comprehensive linting and testing setup
 
+## Setup Scripts
+
+The environment setup is handled by numbered scripts that run in order:
+1. **00-bashrc-store-workspace-path.sh** - Sets reliable WORKSPACE_PATH variable
+2. **01-bashrc-loads-env-file.sh** - Configures .env file loading
+3. **02-bashrc-setups-claude-code-telemetry.sh** - Sets up telemetry (optional)
+4. **03-bashrc-setups-claude-code-config-dir-in-workspace.sh** - Persistent config
+5. **04-install-claude-code.sh** - Installs Claude Code CLI
+6. **05-install-claude-code-common-tools.sh** - Development tools
+7. **06-install-uv.sh** - Python package manager
+8. **10-install-system-dependencies-and-python-environment.sh** - System deps & Python
+
 ## Environment Variables
 
 Key environment variables set up automatically:
+- `WORKSPACE_PATH` - Reliable path to workspace directory (set by 00-bashrc-store-workspace-path.sh)
 - `CODESPACES` - Set when running in GitHub Codespaces
-- `CLAUDE_CONFIG_DIR` - Claude Code configuration directory
-- `UV_PROJECT_ENVIRONMENT` - Python virtual environment location
-- `DEVCONTAINER` - Indicates running in a devcontainer
+- `CLAUDE_CONFIG_DIR` - Claude Code configuration directory (persisted in workspace)
+
+### Telemetry Variables (Optional)
+If configured with Honeycomb credentials:
+- `CLAUDE_CODE_ENABLE_TELEMETRY` - Enables telemetry
+- `OTEL_*` - OpenTelemetry configuration
 
 For more details, see the specific documentation files in this directory.

@@ -5,6 +5,7 @@ This directory contains utility scripts for development and operations.
 ## Contents
 
 - `ps-monitor/` - Real-time process monitoring for Claude Code sessions
+- `migrate-claude-config.sh` - Migrates Claude Code config to persistent location
 - `mcp-servers/` - MCP (Model Context Protocol) server implementations (future)
 
 ## Usage
@@ -14,7 +15,14 @@ Scripts are designed to be run with uv for proper environment setup:
 ```bash
 # Run the process monitor
 uv run scripts/ps-monitor/ps-monitor.py
+
+# Migrate Claude config to persistent location
+./scripts/migrate-claude-config.sh
 ```
+
+### Claude Config Migration
+
+If you're experiencing issues with Claude Code configuration not persisting across container rebuilds, run the migration script. This will move your configuration from the ephemeral home directory to the workspace directory where it will persist.
 
 ## Adding New Scripts
 

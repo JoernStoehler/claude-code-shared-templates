@@ -17,7 +17,7 @@
 
 ## Telemetry Configuration
 
-Claude Code telemetry is configured by the `claude-code-telemetry` feature. Environment variables set:
+Claude Code telemetry can be configured through environment variables. To enable telemetry, add the following to your `.env` file or GitHub secrets:
 ```bash
 CLAUDE_CODE_ENABLE_TELEMETRY=1
 OTEL_SERVICE_NAME=claude-code
@@ -26,19 +26,22 @@ OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 OTEL_METRICS_EXPORTER=otlp
 ```
 
-To disable telemetry, exclude the `claude-code-telemetry` feature from your devcontainer.json or set the `enabled` option to false.
+To disable telemetry, set `CLAUDE_CODE_ENABLE_TELEMETRY=0` or omit the telemetry environment variables.
 
 ## Configuration Directory
 
-Claude Code configuration is stored in:
+Claude Code configuration is automatically set up by the `03-bashrc-setups-claude-code-config-dir-in-workspace.sh` script:
 ```
-$CLAUDE_CONFIG_DIR=/workspaces/.claude-config
+# Set to workspace-relative path
+$CLAUDE_CONFIG_DIR=$WORKSPACE_PATH/.claude-config
 ```
 
 This directory persists:
 - OAuth tokens
-- User preferences
+- User preferences  
 - Session history
+
+**Note**: The configuration directory is automatically created and added to .gitignore to prevent committing sensitive data. The `WORKSPACE_PATH` variable ensures it works reliably in both Codespaces and local environments.
 
 ## Reloading Environment
 

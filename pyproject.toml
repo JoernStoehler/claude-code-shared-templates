@@ -15,7 +15,6 @@ dependencies = [
     
     # Document processing and presentations
     "jupyterlab>=4.0.0",
-    "quarto>=1.4",
     
     # Data analysis and benchmarking
     "pandas>=2.0.0",

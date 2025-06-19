@@ -72,6 +72,24 @@ Successfully transformed the template repository into a composable system with:
 - ✅ Cleaned up redundant postCreateCommand scripts
 - ✅ Maintained backward compatibility
 
+### 🔄 Milestone 2.1: Migration to Script-Based Setup (In Progress)
+
+Migrating from devcontainer features to a more maintainable script-based approach:
+
+#### Completed:
+- ✅ Removed broken devcontainer features from configurations
+- ✅ Created modular script architecture in `.devcontainer/postCreateCommand/`
+- ✅ Implemented numbered scripts that run in sequence:
+  - 01-bashrc-loads-env-file.sh
+  - 02-bashrc-setups-claude-code-telemetry.sh
+  - 03-bashrc-setups-claude-code-config-dir-in-workspace.sh
+  - 04-install-claude-code.sh
+  - 05-install-claude-code-common-tools.sh
+  - 06-install-uv.sh
+  - 10-install-system-dependencies-and-python-environment.sh
+- ✅ Updated documentation to reflect new setup approach
+- ✅ Maintained all functionality from features in script form
+
 ## Future Milestones
 
 ### Milestone 3: Core Application Development

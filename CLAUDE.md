@@ -7,7 +7,8 @@ This is the entry point for Claude Code. This file is automatically read at the 
 You are working in a pre-configured development environment:
 - Current directory: `/workspaces/{branch-name}` (git worktree)
 - Python environment: Active with `uv run`
-- Tools available: `rg`, `jq`, `gh`, `git`, `make`
+- Tools available: `rg`, `fd`, `bat`, `eza`, `jq`, `gh`, `git`, `make`, `claude`
+- Setup: Script-based configuration in `.devcontainer/postCreateCommand/`
 
 ## Essential Documentation
 
@@ -69,6 +70,13 @@ make dev                      # Start dev server
 - Use parallel Read() calls without waiting for efficiency
 - Task() agents can pre-filter/summarize large searches
 - Prefer `mcp__tavily__tavily-search` over WebSearch()
+
+### Environment Setup
+- `.env` file auto-loads in local devcontainers
+- GitHub secrets used in Codespaces
+- `WORKSPACE_PATH` provides reliable workspace directory access
+- Claude config persisted in `$WORKSPACE_PATH/.claude-config`
+- Telemetry configured if Honeycomb credentials provided
 
 ## Getting Started with a Task
 

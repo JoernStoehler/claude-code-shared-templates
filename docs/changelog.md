@@ -8,11 +8,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Devcontainer features for modular setup:
-  - `claude-code` - Installs Claude CLI and sets configuration directory
-  - `claude-code-telemetry` - Configures OpenTelemetry for telemetry (optional)
-  - `claude-code-common-cli-tools` - Installs development tools and git configuration
-  - `claude-code-shared-templates-git-remote` - Sets up template repository as git remote
+- Script-based devcontainer setup in `.devcontainer/postCreateCommand/`:
+  - `00-bashrc-store-workspace-path.sh` - Sets reliable WORKSPACE_PATH variable
+  - `01-bashrc-loads-env-file.sh` - Automatic .env file loading for local development
+  - `02-bashrc-setups-claude-code-telemetry.sh` - Optional telemetry configuration
+  - `03-bashrc-setups-claude-code-config-dir-in-workspace.sh` - Persistent Claude config
+  - `04-install-claude-code.sh` - Claude Code CLI installation
+  - `05-install-claude-code-common-tools.sh` - Development tools (rg, fd, bat, etc.)
+  - `06-install-uv.sh` - uv package manager installation
+  - `10-install-system-dependencies-and-python-environment.sh` - System deps and Python
+- Consistent script header documentation format
+- Numbered script execution system for predictable setup order
+- Reliable `WORKSPACE_PATH` environment variable to fix unreliable container variables
+
+### Changed
+- Migrated from devcontainer features to script-based setup
+- Updated `postCreateCommand` to run all scripts in `.devcontainer/postCreateCommand/` sequentially
+- Moved `setup-dependencies.sh` to `10-install-system-dependencies-and-python-environment.sh`
+- Updated documentation to reflect script-based approach
+- Template sync now requires manual git remote addition
+
+### Removed
+- Devcontainer features dependency (broken feature removed)
+- `setup-dependencies.sh` from root `.devcontainer/` directory
+
+### Previous Release Features
+
+#### Devcontainer Features (Now Replaced)
+- ~~Devcontainer features for modular setup~~ (replaced with scripts)
 - GitHub Actions workflows for feature testing and publishing
 - Modular documentation structure in `docs/claude/`:
   - Environment setup documentation
@@ -23,15 +46,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scripts subdirectory organization (ps-monitor, mcp-servers)
 - Feature test suites
 
-### Changed
+#### Documentation Updates
 - Restructured CLAUDE.md as concise entry point with links to detailed docs
-- Updated devcontainer.json files to use new features
+- ~~Updated devcontainer.json files to use new features~~ (now uses scripts)
 - Moved ps-monitor.py to scripts/ps-monitor/ps-monitor.py
-- Simplified postCreateCommand scripts (functionality moved to features)
-- Environment variable setup now split between features and project-specific
-
-### Deprecated
-- Direct functionality in postCreateCommand scripts 20 and 25 (moved to features)
+- ~~Simplified postCreateCommand scripts~~ (now modularized in subdirectory)
+- Environment variable setup now handled by individual scripts
 
 ### Infrastructure
 - Initial template project setup
