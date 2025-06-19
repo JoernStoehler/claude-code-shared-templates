@@ -66,6 +66,7 @@ make dev                      # Start dev server
 
 ### Tool-Specific Notes
 - Your cwd is immutable - use file paths, not `cd`
+- Bash() always returns to original working directory after execution
 - Environment variables are isolated per Bash() call
 - Use parallel Read() calls without waiting for efficiency
 - Task() agents can pre-filter/summarize large searches

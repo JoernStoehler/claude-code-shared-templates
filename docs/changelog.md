@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `10-install-system-dependencies-and-python-environment.sh` - System deps and Python
 - Consistent script header documentation format
 - Numbered script execution system for predictable setup order
+- CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=1 to ensure consistent working directory
 
 ### Changed
 - Migrated from devcontainer features to script-based setup
