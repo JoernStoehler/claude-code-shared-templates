@@ -9,7 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Script-based devcontainer setup in `.devcontainer/postCreateCommand/`:
-  - `00-bashrc-store-workspace-path.sh` - Sets reliable WORKSPACE_PATH variable
   - `01-bashrc-loads-env-file.sh` - Automatic .env file loading for local development
   - `02-bashrc-setups-claude-code-telemetry.sh` - Optional telemetry configuration
   - `03-bashrc-setups-claude-code-config-dir-in-workspace.sh` - Persistent Claude config
@@ -19,7 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `10-install-system-dependencies-and-python-environment.sh` - System deps and Python
 - Consistent script header documentation format
 - Numbered script execution system for predictable setup order
-- Reliable `WORKSPACE_PATH` environment variable to fix unreliable container variables
 
 ### Changed
 - Migrated from devcontainer features to script-based setup
@@ -27,10 +25,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Moved `setup-dependencies.sh` to `10-install-system-dependencies-and-python-environment.sh`
 - Updated documentation to reflect script-based approach
 - Template sync now requires manual git remote addition
+- WORKSPACE_PATH now set via containerEnv in devcontainer.json using ${containerWorkspaceFolder}
+
+### Fixed
+- Scripts in postCreateCommand now have access to WORKSPACE_PATH environment variable
+- Fixed issue where bash subprocesses couldn't access exported variables from previous scripts
 
 ### Removed
 - Devcontainer features dependency (broken feature removed)
 - `setup-dependencies.sh` from root `.devcontainer/` directory
+- `00-bashrc-store-workspace-path.sh` - No longer needed with containerEnv approach
 
 ### Previous Release Features
 

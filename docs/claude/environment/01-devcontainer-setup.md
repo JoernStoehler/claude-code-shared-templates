@@ -14,6 +14,17 @@ The environment is automatically detected:
 - Local: `CODESPACES` environment variable is unset
 - Codespaces: `CODESPACES` environment variable is set
 
+## Environment Variables
+
+Both devcontainer profiles set essential environment variables using `containerEnv`:
+```json
+"containerEnv": {
+    "WORKSPACE_PATH": "${containerWorkspaceFolder}"
+}
+```
+
+This ensures `WORKSPACE_PATH` is available to all processes and scripts from container startup.
+
 ## Post-Create Scripts
 
 The devcontainers use a modular script-based approach for setup. Scripts are stored in `.devcontainer/postCreateCommand/` and run in numerical order based on their filename prefix.
@@ -42,33 +53,28 @@ This ensures:
 
 ## Current Setup Scripts
 
-1. **00-bashrc-store-workspace-path.sh**:
-   - Sets `WORKSPACE_PATH` environment variable
-   - Ensures reliable workspace path access for all scripts
-   - Persists the variable in ~/.bashrc
-
-2. **01-bashrc-loads-env-file.sh**:
+1. **01-bashrc-loads-env-file.sh**:
    - Configures automatic .env file loading
    - Uses `WORKSPACE_PATH` for consistent file access
 
-3. **02-bashrc-setups-claude-code-telemetry.sh**:
+2. **02-bashrc-setups-claude-code-telemetry.sh**:
    - Optional telemetry configuration
    - Requires Honeycomb credentials
 
-4. **03-bashrc-setups-claude-code-config-dir-in-workspace.sh**:
+3. **03-bashrc-setups-claude-code-config-dir-in-workspace.sh**:
    - Sets Claude config directory in workspace
    - Ensures persistence across container rebuilds
 
-5. **04-install-claude-code.sh**:
+4. **04-install-claude-code.sh**:
    - Installs Claude Code CLI via npm
 
-6. **05-install-claude-code-common-tools.sh**:
+5. **05-install-claude-code-common-tools.sh**:
    - Installs development tools (ripgrep, fd, bat, etc.)
 
-7. **06-install-uv.sh**:
+6. **06-install-uv.sh**:
    - Installs uv Python package manager
 
-8. **10-install-system-dependencies-and-python-environment.sh**:
+7. **10-install-system-dependencies-and-python-environment.sh**:
    - Updates package lists
    - Installs system dependencies (cairo, pango, ffmpeg)
    - Installs Quarto for document processing
@@ -86,7 +92,7 @@ Both profiles include essential extensions:
 
 - Working directory: `/workspaces/{branch-name-slug}` (for git worktrees)
 - Main repository: `/workspaces/{repo-name}`
-- Workspace path: `$WORKSPACE_PATH` (set by setup scripts)
+- Workspace path: `$WORKSPACE_PATH` (set by containerEnv in devcontainer.json)
 - Claude config: `$CLAUDE_CONFIG_DIR` = `$WORKSPACE_PATH/.claude-config`
 - Python environment: Managed by uv in workspace
 

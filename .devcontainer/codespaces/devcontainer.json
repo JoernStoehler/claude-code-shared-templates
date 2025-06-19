@@ -5,6 +5,11 @@
 
   // No volume mounts in Codespaces (volumes are deleted on rebuild)
 
+  "containerEnv": {
+    // Provides consistent workspace path to all scripts and shell sessions
+    "WORKSPACE_PATH": "${containerWorkspaceFolder}"
+  },
+
   // Run all scripts in postCreateCommand directory in order
   "postCreateCommand": "for script in .devcontainer/postCreateCommand/*.sh; do echo \"Running $script...\"; bash \"$script\" || exit 1; done",
 

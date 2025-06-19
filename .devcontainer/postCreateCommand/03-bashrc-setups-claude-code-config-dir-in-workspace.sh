@@ -24,7 +24,7 @@ set -e
 
 echo "Setting up persistent Claude Code configuration directory..."
 
-# Use the WORKSPACE_PATH set by 00-bashrc-store-workspace-path.sh
+# Use the WORKSPACE_PATH set by containerEnv in devcontainer.json
 # Export for current session
 export CLAUDE_CODE_CONFIG_DIR="${WORKSPACE_PATH}/.claude-config"
 
