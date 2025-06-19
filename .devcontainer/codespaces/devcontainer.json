@@ -5,19 +5,16 @@
 
   // Features to add to the dev container
   "features": {
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code:3": {},
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-common-cli-tools:3": {},
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-shared-templates-git-remote:3": {
+    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code:5": {
+      "enableTelemetry": true,
       "templateUrl": "https://github.com/JoernStoehler/claude-code-shared-templates.git"
-    },
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-telemetry:3": {},
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-env-loader:3": {}
+    }
   },
 
   // No volume mounts in Codespaces (volumes are deleted on rebuild)
 
-  // Install Python dependencies after container creation
-  "postCreateCommand": "uv sync --frozen --all-extras --dev || uv sync --all-extras --dev",
+  // Install UV and Python dependencies after container creation
+  "postCreateCommand": ".devcontainer/setup-dependencies.sh",
 
   // Environment setup handled by features and postCreateCommand
 
@@ -39,6 +36,9 @@
         "ms-toolsai.jupyter",
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
+        
+        // Document authoring
+        "quarto.quarto",
         
         // TypeScript/JavaScript (optional, for TS/JS projects)
         "dbaeumer.vscode-eslint",
