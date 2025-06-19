@@ -69,7 +69,7 @@ This ensures:
    - Installs Claude Code CLI via npm
 
 5. **05-install-claude-code-common-tools.sh**:
-   - Installs development tools (ripgrep, fd, bat, etc.)
+   - Installs development tools (ripgrep, fd, jq)
 
 6. **06-install-uv.sh**:
    - Installs uv Python package manager

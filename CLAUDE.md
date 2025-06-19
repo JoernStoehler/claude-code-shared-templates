@@ -7,7 +7,7 @@ This is the entry point for Claude Code. This file is automatically read at the 
 You are working in a pre-configured development environment:
 - Current directory: `/workspaces/{branch-name}` (git worktree)
 - Python environment: Active with `uv run`
-- Tools available: `rg`, `fd`, `bat`, `eza`, `jq`, `gh`, `git`, `make`, `claude`
+- Tools available: `rg`, `fd`, `jq`, `gh`, `git`, `make`, `claude`
 - Setup: Script-based configuration in `.devcontainer/postCreateCommand/`
 
 ## Essential Documentation

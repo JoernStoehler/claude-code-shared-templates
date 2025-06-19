@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `02-bashrc-setups-claude-code-telemetry.sh` - Optional telemetry configuration
   - `03-bashrc-setups-claude-code-config-dir-in-workspace.sh` - Persistent Claude config
   - `04-install-claude-code.sh` - Claude Code CLI installation
-  - `05-install-claude-code-common-tools.sh` - Development tools (rg, fd, bat, etc.)
+  - `05-install-claude-code-common-tools.sh` - Development tools (rg, fd, jq)
   - `06-install-uv.sh` - uv package manager installation
   - `10-install-system-dependencies-and-python-environment.sh` - System deps and Python
 - Consistent script header documentation format
@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated documentation to reflect script-based approach
 - Template sync now requires manual git remote addition
 - WORKSPACE_PATH now set via containerEnv in devcontainer.json using ${containerWorkspaceFolder}
+- Reduced development tools to essentials only (removed bat, eza, httpie, tldr)
 
 ### Fixed
 - Scripts in postCreateCommand now have access to WORKSPACE_PATH environment variable

@@ -168,3 +168,5 @@ override.tf.json
 *_override.tf.json
 .terraformrc
 terraform.rc
+# Claude Code configuration (contains OAuth tokens)
+.claude-config
