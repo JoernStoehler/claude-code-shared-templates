@@ -14,7 +14,7 @@
 #   New: {workspace}/.claude-config (persisted across rebuilds)
 #
 # ACTIONS:
-#   1. Sets CLAUDE_CODE_CONFIG_DIR environment variable
+#   1. Sets CLAUDE_CONFIG_DIR environment variable
 #   2. Creates the configuration directory
 #   3. Adds directory to .gitignore if not already present
 #   4. Configures ~/.bashrc for persistence
@@ -26,11 +26,11 @@ echo "Setting up persistent Claude Code configuration directory..."
 
 # Use the WORKSPACE_PATH set by containerEnv in devcontainer.json
 # Export for current session
-export CLAUDE_CODE_CONFIG_DIR="${WORKSPACE_PATH}/.claude-config"
+export CLAUDE_CONFIG_DIR="${WORKSPACE_PATH}/.claude-config"
 
 # Create the directory
-mkdir -p "${CLAUDE_CODE_CONFIG_DIR}"
-echo "✓ Created configuration directory at ${CLAUDE_CODE_CONFIG_DIR}"
+mkdir -p "${CLAUDE_CONFIG_DIR}"
+echo "✓ Created configuration directory at ${CLAUDE_CONFIG_DIR}"
 
 # Add to .gitignore if not already present
 GITIGNORE_PATH="${WORKSPACE_PATH}/.gitignore"
@@ -53,7 +53,7 @@ fi
 cat >> ~/.bashrc << EOF
 
 # Claude Code configuration directory (persisted across container rebuilds)
-export CLAUDE_CODE_CONFIG_DIR="\${WORKSPACE_PATH}/.claude-config"
+export CLAUDE_CONFIG_DIR="\${WORKSPACE_PATH}/.claude-config"
 EOF
 
 echo "✓ Claude Code configuration directory setup complete"
