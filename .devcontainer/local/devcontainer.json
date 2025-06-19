@@ -4,7 +4,9 @@
 
   "containerEnv": {
     // Provides consistent workspace path to all scripts and shell sessions
-    "WORKSPACE_PATH": "${containerWorkspaceFolder}"
+    "WORKSPACE_PATH": "${containerWorkspaceFolder}",
+    // Ensures Claude Code returns to original directory after each Bash() call
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1"
   },
 
   // Run all scripts in postCreateCommand directory in order
