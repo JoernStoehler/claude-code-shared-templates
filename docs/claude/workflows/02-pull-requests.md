@@ -38,8 +38,13 @@ pwd  # Should show /workspaces/{branch-name}
 git status
 git diff
 
-# Stage all changes
-git add -A
+# Stage specific changes
+git add src/feature.py tests/test_feature.py  # Add specific files
+# OR for multiple files in a directory:
+git add src/new_module/
+
+# Verify what will be committed
+git status
 
 # Commit with conventional format
 git commit -m "feat(feature-name): implement new functionality"
@@ -128,6 +133,20 @@ gh run view <run-id> --log-failed
   - ✅ `fix(parser): handle empty input gracefully`
   - ❌ `Update code`
   - ❌ `Fixed bug`
+
+### Careful Staging
+- Always review changes before staging:
+  ```bash
+  git status          # See all changed files
+  git diff            # Review actual changes
+  git add file1 file2 # Stage specific files only
+  ```
+- Avoid `git add -A` to prevent accidentally committing:
+  - Temporary files or scripts
+  - Debug logs or test outputs
+  - Personal configuration files
+  - Files created during experimentation
+- Use `git status` after staging to verify
 
 ### Description Template
 
@@ -239,7 +258,7 @@ git fetch origin
 git merge origin/main
 
 # Resolve conflicts, then
-git add -A
+git add <resolved-files>
 git commit
 git push
 ```

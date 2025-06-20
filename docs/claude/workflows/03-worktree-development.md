@@ -143,7 +143,8 @@ All standard git commands work normally:
 ```bash
 # In worktree directory
 git status        # Shows worktree branch status
-git add -A        # Stages worktree changes
+git diff          # Review changes
+git add <files>   # Stage specific files
 git commit        # Commits to worktree branch
 git push          # Pushes worktree branch
 ```

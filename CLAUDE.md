@@ -55,7 +55,8 @@ uv run pyright .              # Type checking
 
 # Git workflow  
 git status                    # Check changes
-git add -A                    # Stage all changes
+git diff                      # Review changes
+git add <files>               # Stage specific files
 git commit -m "type: message" # Conventional commit
 gh pr create                  # Create pull request
 
