@@ -4,6 +4,20 @@
 
 This project uses git worktrees to enable parallel development across multiple features. Each Claude Code instance works in its own isolated worktree, allowing multiple agents to work simultaneously without conflicts.
 
+### When to Use Worktrees vs Main
+
+- **Work directly on main** for:
+  - Documentation updates
+  - Configuration changes
+  - Small fixes or improvements
+  - DevOps setup
+  
+- **Use worktrees** for:
+  - New features
+  - Bug fixes that need testing
+  - Refactoring
+  - Any changes requiring parallel development
+
 ## Quick Start
 
 ### Creating a New Feature Worktree
