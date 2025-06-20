@@ -74,7 +74,12 @@ This ensures:
 6. **06-install-uv.sh**:
    - Installs uv Python package manager
 
-7. **10-install-system-dependencies-and-python-environment.sh**:
+7. **07-fix-workspaces-permissions.sh**:
+   - Changes /workspaces ownership to current user
+   - Enables git worktree creation without sudo
+   - Required for parallel development workflow
+
+8. **10-install-system-dependencies-and-python-environment.sh**:
    - Updates package lists
    - Installs system dependencies (cairo, pango, ffmpeg)
    - Installs Quarto for document processing

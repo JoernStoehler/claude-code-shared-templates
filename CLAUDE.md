@@ -26,6 +26,7 @@ You are working in a pre-configured development environment:
 - @docs/claude/workflows/00-task-management.md - Task management and templates
 - @docs/claude/workflows/01-template-sync.md - Template synchronization
 - @docs/claude/workflows/02-pull-requests.md - Pull request workflows
+- @docs/claude/workflows/03-worktree-development.md - Git worktree parallel development
 
 ### 📝 Standards
 - @docs/claude/style/00-coding-standards.md - Language-specific standards
@@ -57,6 +58,11 @@ git status                    # Check changes
 git add -A                    # Stage all changes
 git commit -m "type: message" # Conventional commit
 gh pr create                  # Create pull request
+
+# Git worktrees (parallel development)
+git worktree add /workspaces/feat-name -b feat/name
+code --add /workspaces/feat-name  # Add to VS Code
+cd /workspaces/feat-name && uv sync --all-extras
 
 # Development
 make install                  # Install dependencies
