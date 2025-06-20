@@ -121,6 +121,12 @@ git worktree remove /workspaces/feat-oauth
 # The branch is automatically deleted locally
 ```
 
+**VS Code Cleanup:** After removing a worktree, VS Code will show yellow (missing) folders:
+- Right-click each yellow folder in the Explorer
+- Select "Remove Folder from Workspace"
+
+Note: In a devcontainer, you cannot close/reopen VS Code windows, so manual removal is required.
+
 ## Important Considerations
 
 ### Environment Variables
@@ -171,6 +177,7 @@ git worktree add /workspaces/fix-bug origin/fix/bug-123
 
 # Remove worktree
 git worktree remove /workspaces/feat-api
+# Then in VS Code: right-click yellow folder → "Remove Folder from Workspace"
 
 # Prune stale worktree references
 git worktree prune
@@ -206,6 +213,20 @@ If a worktree path already exists:
 # Force remove and recreate
 git worktree remove --force /workspaces/old-feature
 git worktree add /workspaces/old-feature -b new-feature
+```
+
+### VS Code Shows Yellow Folders After Worktree Removal
+
+In a devcontainer, VS Code doesn't automatically remove folder references:
+1. Right-click each yellow (missing) folder
+2. Select "Remove Folder from Workspace"
+3. This is a manual step required after each `git worktree remove`
+
+Consider creating an alias for cleaner workflow:
+```bash
+# Add to ~/.bashrc
+alias gwtr='git worktree remove'
+echo "Remember to remove yellow folders in VS Code Explorer!"
 ```
 
 ## Best Practices
