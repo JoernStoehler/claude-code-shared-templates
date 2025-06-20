@@ -15,8 +15,10 @@ git worktree add /workspaces/feat-authentication -b feat/authentication
 # Add to VS Code workspace
 code --add /workspaces/feat-authentication
 
-# Start Claude Code in the worktree
+# Setup Python environment
 cd /workspaces/feat-authentication
+uv sync --all-extras
+# VS Code should auto-detect ./.venv/bin/python
 ```
 
 ### Worktree Naming Conventions
@@ -89,8 +91,8 @@ cd /workspaces/feat-oauth
 # Sync dependencies (creates local .venv)
 uv sync --all-extras
 
-# VS Code will prompt to select interpreter
-# Choose: ./.venv/bin/python
+# VS Code should automatically detect ./.venv/bin/python
+# due to the relative path in .vscode/settings.json
 ```
 
 ### 4. Develop Your Feature
