@@ -79,7 +79,12 @@ This ensures:
    - Enables git worktree creation without sudo
    - Required for parallel development workflow
 
-8. **10-install-system-dependencies-and-python-environment.sh**:
+8. **08-add-template-remote.sh**:
+   - Adds Claude Code shared templates repository as 'template' remote
+   - Enables cherry-picking useful files from template repository
+   - Automatically fetches template references
+
+9. **10-install-system-dependencies-and-python-environment.sh**:
    - Updates package lists
    - Installs system dependencies (cairo, pango, ffmpeg)
    - Installs Quarto for document processing

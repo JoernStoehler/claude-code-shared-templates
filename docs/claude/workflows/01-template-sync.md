@@ -6,7 +6,18 @@ The template synchronization system enables bidirectional flow of improvements b
 
 ## Setup
 
-To enable template synchronization, you'll need to manually add the template repository as a git remote:
+The template repository remote is automatically configured by the devcontainer setup script `08-add-template-remote.sh`. This enables bidirectional synchronization of improvements between projects.
+
+### Automatic Setup
+
+The template remote is added automatically during devcontainer creation:
+- Remote name: `template`
+- URL: `https://github.com/JoernStoehler/claude-code-shared-templates.git`
+- Script: `.devcontainer/postCreateCommand/08-add-template-remote.sh`
+
+### Manual Setup (if needed)
+
+If the automatic setup didn't run or you need to add it manually:
 
 ```bash
 # Add template remote
@@ -21,8 +32,6 @@ git remote -v
 # template  https://github.com/JoernStoehler/claude-code-shared-templates.git (fetch)
 # template  https://github.com/JoernStoehler/claude-code-shared-templates.git (push)
 ```
-
-**Note**: This was previously handled by a devcontainer feature but is now a manual step to give you more control over template synchronization.
 
 ## Common Sync Workflows
 

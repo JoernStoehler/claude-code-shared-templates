@@ -15,17 +15,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `04-install-claude-code.sh` - Claude Code CLI installation
   - `05-install-claude-code-common-tools.sh` - Development tools (rg, fd, jq)
   - `06-install-uv.sh` - uv package manager installation
+  - `07-fix-workspaces-permissions.sh` - Fix permissions for git worktree creation
+  - `08-add-template-remote.sh` - Automatic template repository remote setup
   - `10-install-system-dependencies-and-python-environment.sh` - System deps and Python
 - Consistent script header documentation format
 - Numbered script execution system for predictable setup order
 - CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=1 to ensure consistent working directory
+- Automatic template repository remote configuration for cherry-picking useful files
 
 ### Changed
 - Migrated from devcontainer features to script-based setup
 - Updated `postCreateCommand` to run all scripts in `.devcontainer/postCreateCommand/` sequentially
 - Moved `setup-dependencies.sh` to `10-install-system-dependencies-and-python-environment.sh`
 - Updated documentation to reflect script-based approach
-- Template sync now requires manual git remote addition
+- Template sync now automated via `08-add-template-remote.sh` script
 - WORKSPACE_PATH now set via containerEnv in devcontainer.json using ${containerWorkspaceFolder}
 - Reduced development tools to essentials only (removed bat, eza, httpie, tldr)
 
