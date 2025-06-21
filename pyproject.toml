@@ -1,36 +1,23 @@
 [project]
-name = "seminar-ki-in-der-mathematik"
+name = "your-project-name"
 version = "0.1.0"
-description = "Materials and infrastructure for 'KI in der Mathematik' seminar - MSc Mathematics, University of Augsburg, SS2025"
+description = "Your project description"
 authors = [
-    { name = "Jörn Stöhler", email = "your-email@example.com" }
+    { name = "Your Name", email = "your-email@example.com" }
 ]
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    # Presentation and visualization
-    "matplotlib>=3.7.0",
-    "plotly>=5.18.0",
-    "manim>=0.18.0",  # For mathematical animations
-    
-    # Document processing and presentations
-    "jupyterlab>=4.0.0",
-    
-    # Data analysis and benchmarking
-    "pandas>=2.0.0",
-    "numpy>=1.24.0",
-    
-    # AI/ML tools for benchmarking
-    "openai>=1.0.0",
-    "anthropic>=0.21.0",
-    "langchain>=0.1.0",
-    
-    # Utilities
+    # Core dependencies
     "pydantic>=2.0.0",
-    "httpx>=0.25.0",
-    "tqdm>=4.66.0",
-    "click>=8.1.0",
-    "rich>=13.0.0",
+    
+    # Add your project-specific dependencies here
+    # Examples:
+    # "fastapi>=0.104.0",  # For web APIs
+    # "numpy>=1.24.0",      # For numerical computing
+    # "pandas>=2.0.0",      # For data analysis
+    # "httpx>=0.25.0",      # For HTTP requests
+    # "click>=8.1.0",       # For CLI tools
 ]
 
 [project.optional-dependencies]
@@ -40,74 +27,49 @@ dev = [
     "pyright>=1.1.350",
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
-    "pytest-xdist>=3.3.0",
+    "pytest-xdist>=3.3.1",
     "pre-commit>=3.5.0",
-    # ps-monitor dependencies
-    "psutil>=5.9.0",
 ]
+
+[project.urls]
+homepage = "https://github.com/YourUsername/your-project-name"
+repository = "https://github.com/YourUsername/your-project-name"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.metadata]
-allow-direct-references = true
-
 [tool.hatch.build.targets.wheel]
-packages = ["src/seminar"]
+packages = ["src/myproject"]
 
-# Ruff configuration - minimal rules focused on bug prevention
 [tool.ruff]
-line-length = 100
+line-length = 120
 target-version = "py311"
-exclude = [
-    ".git",
-    ".ruff_cache",
-    ".venv",
-    "venv",
-    "__pycache__",
-    "build",
-    "dist",
-]
 
 [tool.ruff.lint]
 select = [
-    "E",     # pycodestyle errors
-    "F",     # pyflakes
-    "I",     # isort
-    "UP",    # pyupgrade
-    "B",     # flake8-bugbear
-    "SIM",   # flake8-simplify
-    "RUF",   # ruff-specific rules
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "I",   # isort
 ]
 ignore = [
     "E501",  # line too long (handled by formatter)
-    "B008",  # do not perform function calls in argument defaults
-    "B904",  # raise from None
-    "SIM105", # use contextlib.suppress
+    "E731",  # lambda assignment
 ]
 
-[tool.ruff.lint.isort]
-known-first-party = ["seminar"]
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]  # unused imports in __init__ files
 
-# Pyright configuration - standard mode
 [tool.pyright]
-include = ["src", "tests", "scripts"]
-exclude = [
-    "**/__pycache__",
-    ".venv",
-    "venv",
-    ".git",
-    "build",
-    "dist",
-]
-typeCheckingMode = "standard"
 pythonVersion = "3.11"
-reportMissingImports = true
-reportMissingTypeStubs = false
-reportUnknownArgumentType = false
-reportUnknownVariableType = false
-reportUnknownMemberType = false
+typeCheckingMode = "standard"
+reportUnusedImport = true
+reportUnusedVariable = true
+reportUnusedFunction = false
 reportGeneralTypeIssues = true
 reportOptionalMemberAccess = true
 reportOptionalCall = true
@@ -115,74 +77,48 @@ reportOptionalIterable = true
 reportOptionalContextManager = true
 reportOptionalOperand = true
 reportTypedDictNotRequiredAccess = true
-reportPrivateImportUsage = true
-reportConstantRedefinition = true
-reportIncompatibleMethodOverride = true
-reportIncompatibleVariableOverride = true
-reportInconsistentConstructor = true
-reportOverlappingOverload = true
-reportUninitializedInstanceVariable = true
-reportCallInDefaultInitializer = true
-reportUnnecessaryIsInstance = true
-reportUnnecessaryCast = true
-reportUnnecessaryComparison = true
-reportUnnecessaryContains = true
-reportAssertAlwaysTrue = true
-reportSelfClsParameterName = true
-reportUnusedClass = true
-reportUnusedImport = true
-reportUnusedFunction = true
-reportUnusedVariable = true
-reportDuplicateImport = true
-reportWildcardImportFromLibrary = true
-reportOptionalSubscript = true
-reportPrivateUsage = true
-reportUnboundVariable = true
+reportUnnecessaryTypeIgnoreComment = true
+reportUnknownParameterType = false
+reportUnknownArgumentType = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportMissingTypeArgument = false
+reportMissingTypeStubs = false
+reportPrivateUsage = false
 
-# Pytest configuration
 [tool.pytest.ini_options]
-minversion = "7.0"
 testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*", "*Tests"]
+python_functions = ["test_*"]
 addopts = [
     "-v",
     "--strict-markers",
-    "--strict-config",
-    "--cov=src/seminar",
-    "--cov-branch",
-    "--cov-report=term-missing:skip-covered",
+    "--tb=short",
+    "--cov=src/myproject",
+    "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
-    "--cov-fail-under=70",
+    "--cov-fail-under=80",
 ]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
 
-# Coverage configuration
 [tool.coverage.run]
-source = ["src/seminar"]
-branch = true
+source = ["src/myproject"]
 omit = [
     "*/tests/*",
-    "*/__pycache__/*",
-    "*/venv/*",
-    "*/.venv/*",
+    "*/__init__.py",
 ]
 
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
     "raise AssertionError",
     "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
+    "if __name__ == .__main__.:",
 ]
-
-[tool.coverage.html]
-directory = "htmlcov"

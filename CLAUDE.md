@@ -5,7 +5,7 @@ This is the entry point for Claude Code. This file is automatically read at the 
 ## Quick Start
 
 You are working in a pre-configured development environment:
-- Current directory: Either `/workspaces/seminar-ki-in-der-mathematik` (main) or `/workspaces/{branch-name}` (git worktree)
+- Current directory: Either `/workspaces/{repository-name}` (main) or `/workspaces/{branch-name}` (git worktree)
 - Python environment: Active with `uv run`
 - Tools available: `rg`, `fd`, `jq`, `gh`, `git`, `make`, `claude`
 - Setup: Script-based configuration in `.devcontainer/postCreateCommand/`
