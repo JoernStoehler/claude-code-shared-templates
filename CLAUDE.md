@@ -5,9 +5,12 @@ This is the entry point for Claude Code. This file is automatically read at the 
 ## Quick Start
 
 You are working in a pre-configured development environment:
-- Current directory: `/workspaces/{branch-name}` (git worktree)
+- Current directory: Either `/workspaces/your-project-name` (main) or `/workspaces/{branch-name}` (git worktree)
 - Python environment: Active with `uv run`
-- Tools available: `rg`, `jq`, `gh`, `git`, `make`
+- Tools available: `rg`, `fd`, `jq`, `gh`, `git`, `make`, `claude`
+- Setup: Script-based configuration in `.devcontainer/postCreateCommand/`
+
+Note: Small changes (docs, configs) can be done directly on main. Use worktrees for features/fixes.
 
 ## Essential Documentation
 
@@ -25,6 +28,8 @@ You are working in a pre-configured development environment:
 - @docs/claude/workflows/00-task-management.md - Task management and templates
 - @docs/claude/workflows/01-template-sync.md - Template synchronization
 - @docs/claude/workflows/02-pull-requests.md - Pull request workflows
+- @docs/claude/workflows/03-worktree-development.md - Git worktree parallel development
+- @docs/claude/workflows/04-template-sync-troubleshooting.md - Template sync troubleshooting
 
 ### 📝 Standards
 - @docs/claude/style/00-coding-standards.md - Language-specific standards
@@ -53,9 +58,15 @@ uv run pyright .              # Type checking
 
 # Git workflow  
 git status                    # Check changes
-git add -A                    # Stage all changes
+git diff                      # Review changes
+git add <files>               # Stage specific files
 git commit -m "type: message" # Conventional commit
 gh pr create                  # Create pull request
+
+# Git worktrees (parallel development)
+git worktree add /workspaces/feat-name -b feat/name
+code --add /workspaces/feat-name  # Add to VS Code
+cd /workspaces/feat-name && uv sync --all-extras
 
 # Development
 make install                  # Install dependencies
@@ -64,11 +75,18 @@ make dev                      # Start dev server
 ```
 
 ### Tool-Specific Notes
-- Your cwd is immutable - use file paths, not `cd`
+- You can use `cd` commands to navigate directories
 - Environment variables are isolated per Bash() call
 - Use parallel Read() calls without waiting for efficiency
 - Task() agents can pre-filter/summarize large searches
 - Prefer `mcp__tavily__tavily-search` over WebSearch()
+
+### Environment Setup
+- `.env` file auto-loads in local devcontainers
+- GitHub secrets used in Codespaces
+- `WORKSPACE_PATH` provides reliable workspace directory access
+- Claude config persisted in `$WORKSPACE_PATH/.claude-config`
+- Telemetry configured if Honeycomb credentials provided
 
 ## Getting Started with a Task
 

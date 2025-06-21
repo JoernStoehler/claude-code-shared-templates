@@ -4,158 +4,279 @@
 
 The template synchronization system enables bidirectional flow of improvements between the template repository and derived projects. This ensures all projects benefit from enhancements made in any project.
 
-## Setup
+## Important Concepts
 
-The `claude-template-remote` devcontainer feature automatically configures the template repository as a git remote:
+### Template Repositories Are Independent
+- Template repositories have **completely separate git histories**
+- They are **not forks** - there's no shared commit ancestor
+- You **cannot** use git merge, cherry-pick, or rebase between them
+- You **must** copy files, not git commits
+
+### Two-Way Sync
+1. **Pull from template**: Get improvements from the template
+2. **Push to template**: Share your improvements back
+
+## One-Time Setup
+
+Clone the template repository once:
 
 ```bash
-# Verify template remote exists
-git remote -v
-
-# Should show:
-# origin    https://github.com/YourOrg/your-project.git (fetch)
-# origin    https://github.com/YourOrg/your-project.git (push)
-# template  https://github.com/JoernStoehler/claude-code-shared-templates.git (fetch)
-# template  https://github.com/JoernStoehler/claude-code-shared-templates.git (push)
+cd /workspaces
+git clone $CLAUDE_TEMPLATE_REPO_URL
+# The template URL is set in devcontainer.json:
+# https://github.com/JoernStoehler/claude-code-shared-templates.git
 ```
 
-## Common Sync Workflows
+This clone will be used with worktrees for all template operations.
 
-### 1. Pull Updates from Template
+## Pulling Updates from Template
 
-To incorporate latest template improvements into your project:
+To get updates from the template, use the cloned repository:
+
+### 1. Update Template Clone
 
 ```bash
-# Fetch latest changes
-git fetch template
-
-# Review changes
-git log --oneline template/main..HEAD
-
-# Merge template updates
-git merge template/main
-
-# Resolve any conflicts
-# Then commit the merge
+cd /workspaces/claude-code-shared-templates
+git fetch origin
+git pull origin main
 ```
 
-### 2. Cherry-Pick Specific Changes
+### 2. Review and Copy Updates
 
-For selective updates:
-
+#### Option A: Direct Copy from Main
 ```bash
-# View template commits
-git log --oneline template/main
+# Compare specific files
+diff CLAUDE.md /workspaces/your-project-name/CLAUDE.md
 
-# Cherry-pick specific commit
-git cherry-pick <commit-hash>
+# Copy improved files to your project
+cp docs/claude/workflows/new-workflow.md \
+   /workspaces/your-project-name/docs/claude/workflows/
+
+# Or use VS Code to compare
+code --diff CLAUDE.md /workspaces/your-project-name/CLAUDE.md
 ```
 
-### 3. Compare Files
+#### Option B: Create Review Worktree
+```bash
+# If you want to review changes in a separate directory
+git worktree add /workspaces/template-review
 
-To see differences between your project and template:
+cd /workspaces/template-review
+# Review files, copy what you need
+
+# Clean up when done
+cd /workspaces/claude-code-shared-templates
+git worktree remove /workspaces/template-review
+```
+
+### 3. Commit Updates to Your Project
 
 ```bash
-# Compare specific file
-git diff HEAD template/main -- CLAUDE.md
+cd /workspaces/your-project-name
+git add -A
+git commit -m "chore: sync improvements from template
 
-# Compare directory
-git diff HEAD template/main -- scripts/
-
-# List changed files
-git diff --name-only HEAD template/main
+- Updated workflow documentation
+- Improved devcontainer scripts"
 ```
 
 ## Contributing Back to Template
 
 When you've made improvements that would benefit other projects:
 
-### 1. Identify Shareable Changes
+### Step 1: Identify Shareable Improvements
 
 Good candidates for template contribution:
 - Claude Code workflow improvements
-- Devcontainer enhancements  
+- Devcontainer setup scripts in `.devcontainer/postCreateCommand/`
 - General utility scripts (like @scripts/ps-monitor/ps-monitor.py)
 - Documentation improvements
 - Bug fixes in template code
+- Environment setup improvements
 
 Not suitable for template:
 - Project-specific business logic
 - Domain-specific utilities
 - Proprietary code
+- Project-specific dependencies
 
-### 2. Prepare Changes
+### Step 2: Create Feature Worktree
 
 ```bash
-# Create a branch from template
-git checkout -b template-improvement template/main
+cd /workspaces/claude-code-shared-templates
 
-# Cherry-pick your improvements
-git cherry-pick <your-commits>
-
-# Or manually apply changes
-git checkout your-branch -- path/to/improved/file
+# Create worktree for your improvements
+git worktree add /workspaces/feat-improved-docs -b feat/improved-docs
+cd /workspaces/feat-improved-docs
 ```
 
-### 3. Submit to Template
+### Step 3: Copy and Generalize Improvements
 
-1. Fork the template repository on GitHub
-2. Push your branch to your fork
-3. Create a PR to the template repository
-4. Describe the improvements and their benefits
+```bash
+# Copy improvements from your project
+cp /workspaces/your-project-name/.devcontainer/postCreateCommand/*.sh \
+   .devcontainer/postCreateCommand/
 
-## Handling Conflicts
+# Copy documentation
+cp -r /workspaces/your-project-name/docs/claude/workflows/ \
+      docs/claude/
 
-Common conflict scenarios and resolutions:
+# Generalize the files - replace project-specific content
+find . -type f -name "*.md" -exec sed -i 's/your-project-name/your-project-name/g' {} \;
+find . -type f -name "*.sh" -exec sed -i 's/your-project-name/{repository-name}/g' {} \;
 
-### Modified Scripts
-- Template updated a script you've customized
-- Resolution: Carefully merge, preserving both improvements
+# Review changes
+git diff
+git status
+```
 
-### Documentation Changes
-- Both template and project updated CLAUDE.md
-- Resolution: Usually keep both sets of changes
+### Step 4: Commit and Create PR
 
-### Devcontainer Updates
-- Template improved devcontainer setup
-- Resolution: Generally accept template version, reapply customizations
+```bash
+# Stage and commit
+git add -A
+git commit -m "feat: add improved documentation structure
+
+- Add comprehensive worktree workflow docs
+- Improve template sync documentation
+- Add troubleshooting guides
+- Fix bash script error handling"
+
+# Push to origin
+git push -u origin feat/improved-docs
+
+# Create PR (gh will handle forking if needed!)
+gh pr create \
+  --title "Add improved documentation from seminar project" \
+  --body "## Summary
+This PR adds improved documentation structure developed in the seminar project.
+
+## Changes
+- Comprehensive worktree workflow documentation
+- Clearer template sync process
+- Troubleshooting guides
+- Script improvements
+
+## Testing
+- Tested in active project
+- Documentation reviewed for clarity"
+```
+
+### Step 5: Clean Up
+
+```bash
+# After PR is merged
+cd /workspaces/claude-code-shared-templates
+git worktree remove /workspaces/feat-improved-docs
+
+# Update main
+git checkout main
+git pull origin main
+```
+
+## Generalizing Files
+
+When contributing to the template, replace project-specific content:
+
+| Original | Template Version |
+|----------|-----------------|
+| `your-project-name` | `your-project-name` or `{repository-name}` |
+| `/workspaces/your-project-name` | `/workspaces/{repository-name}` |
+| Specific API keys | `YOUR_API_KEY_HERE` |
+| Specific dependencies | Comment with examples |
+| Business logic | Generic examples |
+
+Example transformation:
+```python
+# Project-specific
+PROJECT_NAME = "your-project-name"
+PROFESSOR = "Prof. Dr. Müller"
+
+# Template version
+PROJECT_NAME = "your-project-name"  # Update this
+# PROFESSOR = "Your professor"  # Uncomment and update if needed
+```
+
+## Common Patterns
+
+### Syncing Multiple Files
+
+```bash
+# In template worktree
+cd /workspaces/feat-sync-configs
+
+# Copy multiple config files
+for file in .gitignore .env.example Makefile; do
+  cp /workspaces/your-project-name/$file .
+done
+
+# Generalize all at once
+find . -type f -exec sed -i 's/project-specific/generic/g' {} \;
+```
+
+### Selective Directory Sync
+
+```bash
+# Copy directory structure but exclude specific files
+rsync -av \
+  --exclude='*.pyc' \
+  --exclude='__pycache__' \
+  --exclude='project-specific-*' \
+  /workspaces/your-project-name/scripts/ \
+  ./scripts/
+```
+
+### Testing Template Changes
+
+```bash
+# Create a test project from your modified template
+cd /tmp
+git clone /workspaces/feat-new-feature test-template
+cd test-template
+# Verify everything works for a new project
+```
 
 ## Best Practices
 
-1. **Regular Syncs**: Check for template updates monthly
-2. **Document Divergence**: Note in project docs why you diverged from template
-3. **Contribute General Improvements**: Share non-specific enhancements
-4. **Test After Sync**: Run full test suite after merging template changes
-5. **Preserve Project Specifics**: Don't overwrite project-specific configurations
+1. **One-time clone** - Clone template once, use worktrees for everything
+2. **Consistent locations** - All worktrees in `/workspaces/`
+3. **Descriptive branch names** - `feat/what-you-added`
+4. **Generalize thoroughly** - Search for all project-specific strings
+5. **Test the template** - Ensure it works for new projects
+6. **Small, focused PRs** - One improvement type per PR
+7. **Clean up worktrees** - Remove after PR is merged
+8. **Keep template updated** - Regular `git pull origin main`
 
-## Example: Syncing ps-monitor Improvements
-
-The @scripts/ps-monitor/ps-monitor.py tool is a good example of shareable functionality:
+## Quick Reference
 
 ```bash
-# After improving ps-monitor in your project
-git add scripts/ps-monitor/ps-monitor.py
-git commit -m "feat(ps-monitor): add memory usage tracking"
+# One-time setup
+cd /workspaces && git clone $CLAUDE_TEMPLATE_REPO_URL
 
-# Share with template
-git checkout -b improve-ps-monitor template/main
-git cherry-pick <commit-hash>
-git push fork improve-ps-monitor
-# Create PR to template
+# Pull from template
+cd /workspaces/claude-code-shared-templates && git pull
+cp improved-file /workspaces/your-project-name/
+
+# Contribute to template
+cd /workspaces/claude-code-shared-templates
+git worktree add /workspaces/feat-name -b feat/name
+cd /workspaces/feat-name
+# ... copy and generalize files ...
+git add -A && git commit -m "feat: description"
+git push -u origin feat/name
+gh pr create
+
+# Clean up
+git worktree remove /workspaces/feat-name
 ```
 
 ## Troubleshooting
 
-### "refusing to merge unrelated histories"
-```bash
-git merge template/main --allow-unrelated-histories
-```
+For common issues and detailed troubleshooting, see @docs/claude/workflows/04-template-sync-troubleshooting.md
 
-### Large conflicts after long divergence
-Consider manual file-by-file comparison rather than full merge
+### Key Points to Remember
 
-### Template remote missing
-The `claude-template-remote` feature should add it automatically, but manually:
-```bash
-git remote add template https://github.com/JoernStoehler/claude-code-shared-templates.git
-```
+- **No git operations between repos** - Only file copying works
+- **Use worktrees for isolation** - Same pattern as project development
+- **Let gh handle forking** - No need for fork remotes
+- **Generalize everything** - Remove all project-specific content

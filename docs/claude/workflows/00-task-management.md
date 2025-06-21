@@ -12,8 +12,16 @@ For complex, multi-step tasks requiring careful planning:
 Usually pre-completed:
 - Remote CI/CD configured
 - Devcontainer running
-- Git worktree created
 - Dependencies installed
+
+Create worktree for your task:
+```bash
+# Create worktree for feature
+git worktree add /workspaces/feat-{name} -b feat/{name}
+code --add /workspaces/feat-{name}
+cd /workspaces/feat-{name}
+uv sync --all-extras
+```
 
 ### 2. Task Understanding
 - Read task description carefully
@@ -63,7 +71,7 @@ Usually pre-completed:
 
 For straightforward, well-defined tasks:
 
-1. **Setup** ✓ (pre-completed)
+1. **Setup** ✓ (pre-completed) + create worktree if needed
 2. **Read task** and clarify requirements
 3. **Explore codebase** for context
 4. **Plan** using Todo() tool

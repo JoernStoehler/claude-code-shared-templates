@@ -1,25 +1,23 @@
 {
-  "name": "Universal Template (Codespaces)",
+  "name": "Your Project Name (Codespaces)",
   // Codespaces uses its own base image by default
   // "image": "mcr.microsoft.com/devcontainers/universal:2",
 
-  // Features to add to the dev container
-  "features": {
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code:3": {},
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-common-cli-tools:3": {},
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-shared-templates-git-remote:3": {
-      "templateUrl": "https://github.com/JoernStoehler/claude-code-shared-templates.git"
-    },
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-telemetry:3": {},
-    "ghcr.io/joernstoehler/claude-code-devcontainer-features/claude-code-env-loader:3": {}
-  },
-
   // No volume mounts in Codespaces (volumes are deleted on rebuild)
 
-  // Install Python dependencies after container creation
-  "postCreateCommand": "uv sync --frozen --all-extras --dev || uv sync --all-extras --dev",
+  "containerEnv": {
+    // Provides consistent workspace path to all scripts and shell sessions
+    "WORKSPACE_PATH": "${containerWorkspaceFolder}",
+    // Template repository URL for reference
+    "CLAUDE_TEMPLATE_REPO_URL": "https://github.com/JoernStoehler/claude-code-shared-templates.git"
+    // Commented out - causes issues with cd commands
+    // "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1"
+  },
 
-  // Environment setup handled by features and postCreateCommand
+  // Run all scripts in postCreateCommand directory in order
+  "postCreateCommand": "for script in .devcontainer/postCreateCommand/*.sh; do echo \"Running $script...\"; bash \"$script\" || exit 1; done",
+
+  // Environment setup handled by postCreateCommand scripts
 
   // VS Code extensions and settings
   "customizations": {
@@ -39,6 +37,9 @@
         "ms-toolsai.jupyter",
         "ms-python.vscode-pylance",
         "charliermarsh.ruff",
+        
+        // Document authoring
+        "quarto.quarto",
         
         // TypeScript/JavaScript (optional, for TS/JS projects)
         "dbaeumer.vscode-eslint",
