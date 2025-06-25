@@ -20,7 +20,7 @@ This project uses a modular dependency structure to optimize CI/CD performance a
 #### `animations` - Mathematical Animations
 - **manim**: Create mathematical animations (knot theory, transformations)
 - **System requirements**: libcairo2-dev, libpango1.0-dev, ffmpeg
-- **Install**: `make install-animations`
+- **Install**: `uv sync --extra animations`
 - **Use case**: Creating visual demonstrations for presentations
 
 #### `slides` - Presentation Tools
@@ -28,14 +28,14 @@ This project uses a modular dependency structure to optimize CI/CD performance a
 - **matplotlib**: Static plotting and figures
 - **plotly**: Interactive visualizations
 - **Note**: Quarto installed separately via system package
-- **Install**: `make install-slides`
+- **Install**: `uv sync --extra slides`
 - **Use case**: Building course materials and slides
 
 #### `ai` - AI/ML Integration
 - **openai**: OpenAI API client
 - **anthropic**: Anthropic (Claude) API client
 - **langchain**: LLM application framework
-- **Install**: `make install-ai`
+- **Install**: `uv sync --extra ai`
 - **Use case**: AI benchmarking and experiments
 
 #### `ci` - CI/CD Minimal Set
@@ -43,49 +43,45 @@ This project uses a modular dependency structure to optimize CI/CD performance a
 - **pyright**: Type checker
 - **pytest**: Testing framework
 - **pytest-cov**: Coverage reporting
-- **Install**: `make install-ci`
+- **Install**: `uv sync --extra ci`
 - **Use case**: GitHub Actions CI pipeline (minimal deps for speed)
 
 #### `dev` - Full Development
 - Everything from `ci` plus:
 - **pytest-xdist**: Parallel test execution
 - **pre-commit**: Git hook framework
-- **Install**: `make install-dev`
+- **Install**: `uv sync --extra dev`
 - **Use case**: Local development environment
 
 ## Installation Commands
 
 ```bash
-# Core dependencies only (minimal)
+# Install all dependencies (currently installs all dev dependencies)
 make install
 
-# Full development environment (recommended)
-make install-dev
-
-# Specific features
-make install-animations  # For manim
-make install-slides     # For presentations
-make install-ai         # For AI experiments
-
-# CI environment (used by GitHub Actions)
-make install-ci
+# Specific dependency groups (requires pyproject.toml configuration)
+uv sync --extra dev        # Full development environment
+uv sync --extra animations # For manim animations
+uv sync --extra slides     # For presentations  
+uv sync --extra ai         # For AI experiments
+uv sync --extra ci         # CI environment (minimal)
 ```
 
 ## Common Scenarios
 
 ### New Developer Setup
-The devcontainer automatically runs `make install-dev`, giving you everything needed for development.
+The devcontainer automatically runs `uv sync --extra dev`, giving you everything needed for development.
 
 ### Working on Animations
 If you see `ModuleNotFoundError: No module named 'manim'`:
 ```bash
-make install-animations
+uv sync --extra animations
 ```
 
 ### Creating Presentations
 If you see `ModuleNotFoundError: No module named 'matplotlib'`:
 ```bash
-make install-slides
+uv sync --extra slides
 ```
 
 ### CI/CD Pipeline
@@ -112,7 +108,7 @@ Quarto is installed separately in the devcontainer setup. For manual installatio
 ### Import Errors
 If you get import errors, check which dependency group contains the package:
 1. Look in `pyproject.toml` under `[project.optional-dependencies]`
-2. Install the appropriate group with `make install-<group>`
+2. Install the appropriate group with `uv sync --extra <group>`
 
 ### CI Failures
 CI uses minimal dependencies. If CI fails but local tests pass:
