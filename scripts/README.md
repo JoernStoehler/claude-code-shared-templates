@@ -5,15 +5,21 @@ This directory contains utility scripts for development and operations.
 ## Contents
 
 - `ps-monitor/` - Real-time process monitoring for Claude Code sessions
+- `worktree-manager/` - Git worktree automation and multi-repo development tools
 - `mcp-servers/` - MCP (Model Context Protocol) server implementations (future)
 
 ## Usage
 
-Scripts are designed to be run with uv for proper environment setup:
+Scripts are designed to be run with proper environment setup:
 
 ```bash
 # Run the process monitor
 uv run scripts/ps-monitor/ps-monitor.py
+
+# Git worktree management (bash scripts, added to PATH in devcontainer)
+claude-worktree create feat/new-feature
+claude-worktree status
+claude-clone clone user/repo
 ```
 
 ## Adding New Scripts

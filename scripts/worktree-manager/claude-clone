@@ -1,0 +1,348 @@
+#!/bin/bash
+#
+# claude-clone - Repository cloning tool for Claude Code multi-repo development
+#
+# Commands:
+#   claude-clone clone <repo-url|github-user/repo> [name] - Clone a repository
+#   claude-clone remove <repo-name>                        - Remove a cloned repository
+#   claude-clone status                                    - Show status of all repositories
+#
+# Examples:
+#   claude-clone clone https://github.com/user/repo.git
+#   claude-clone clone user/repo
+#   claude-clone clone user/repo my-custom-name
+#
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Print error message and exit
+error() {
+    echo -e "${RED}Error: $1${NC}" >&2
+    exit 1
+}
+
+# Print warning message
+warning() {
+    echo -e "${YELLOW}Warning: $1${NC}" >&2
+}
+
+# Print success message
+success() {
+    echo -e "${GREEN}✓ $1${NC}"
+}
+
+# Print info message
+info() {
+    echo -e "${BLUE}→ $1${NC}"
+}
+
+# Check if gh is available and authenticated
+check_gh_auth() {
+    if ! command -v gh > /dev/null 2>&1; then
+        error "gh CLI is not installed\nPlease install GitHub CLI: https://cli.github.com/"
+    fi
+    
+    if ! gh auth status > /dev/null 2>&1; then
+        error "gh is not authenticated\nPlease run: gh auth login"
+    fi
+}
+
+# Parse repository URL/reference
+parse_repo_reference() {
+    local input="$1"
+    local repo_url=""
+    local repo_name=""
+    
+    # Handle different input formats
+    if [[ "$input" =~ ^https?://github\.com/([^/]+)/([^/]+)(\.git)?$ ]]; then
+        # Full GitHub URL
+        local owner="${BASH_REMATCH[1]}"
+        local repo="${BASH_REMATCH[2]}"
+        repo_url="https://github.com/$owner/$repo.git"
+        repo_name="$repo"
+    elif [[ "$input" =~ ^git@github\.com:([^/]+)/([^/]+)(\.git)?$ ]]; then
+        # SSH URL
+        local owner="${BASH_REMATCH[1]}"
+        local repo="${BASH_REMATCH[2]}"
+        repo_url="$input"
+        repo_name="$repo"
+    elif [[ "$input" =~ ^([^/]+)/([^/]+)$ ]]; then
+        # GitHub shorthand (user/repo)
+        local owner="${BASH_REMATCH[1]}"
+        local repo="${BASH_REMATCH[2]}"
+        repo_url="https://github.com/$owner/$repo.git"
+        repo_name="$repo"
+    else
+        error "Invalid repository format: $input\nExpected formats:\n  - https://github.com/user/repo.git\n  - git@github.com:user/repo.git\n  - user/repo"
+    fi
+    
+    echo "$repo_url|$repo_name"
+}
+
+# Clone a repository
+clone_repository() {
+    local repo_ref="$1"
+    local custom_name="$2"
+    
+    if [ -z "$repo_ref" ]; then
+        error "Usage: claude-clone clone <repo-url|github-user/repo> [name]"
+    fi
+    
+    # Check gh authentication
+    check_gh_auth
+    
+    # Parse repository reference
+    local parsed=$(parse_repo_reference "$repo_ref")
+    local repo_url=$(echo "$parsed" | cut -d'|' -f1)
+    local repo_name=$(echo "$parsed" | cut -d'|' -f2)
+    
+    # Use custom name if provided
+    if [ -n "$custom_name" ]; then
+        repo_name="$custom_name"
+    fi
+    
+    # Determine target path
+    local target_path="/workspaces/$repo_name"
+    
+    # Check if target already exists
+    if [ -e "$target_path" ]; then
+        error "Target path already exists: $target_path\nPlease choose a different name or remove the existing directory"
+    fi
+    
+    # Check if we're currently in /workspaces
+    if [[ "$(pwd)" =~ ^/workspaces/ ]]; then
+        # Save current directory
+        local current_dir=$(pwd)
+        info "Saving current directory: $current_dir"
+    fi
+    
+    # Clone the repository using gh
+    info "Cloning $repo_url to $target_path..."
+    gh repo clone "$repo_url" "$target_path" || error "Failed to clone repository\nMake sure you have access to the repository"
+    
+    # Check if it's a private repo by trying to access it
+    if (cd "$target_path" && git ls-remote origin > /dev/null 2>&1); then
+        success "Repository cloned successfully!"
+    else
+        warning "Repository cloned but may have access issues"
+    fi
+    
+    # Run uv sync if pyproject.toml exists
+    if [ -f "$target_path/pyproject.toml" ]; then
+        info "Python project detected. Setting up environment..."
+        (cd "$target_path" && uv sync --all-extras) || warning "uv sync failed\nYou may need to run 'uv sync --all-extras' manually"
+    fi
+    
+    # Run npm install if package.json exists
+    if [ -f "$target_path/package.json" ]; then
+        info "Node.js project detected. Installing dependencies..."
+        (cd "$target_path" && npm install) || warning "npm install failed\nYou may need to run 'npm install' manually"
+    fi
+    
+    # Add to VS Code workspace if code command is available
+    if command -v code > /dev/null 2>&1; then
+        info "Adding to VS Code workspace..."
+        code --add "$target_path" || warning "Failed to add to VS Code workspace"
+    fi
+    
+    # Show repository info
+    echo ""
+    info "Repository details:"
+    echo "  Path: $target_path"
+    if (cd "$target_path" && git remote get-url origin > /dev/null 2>&1); then
+        echo "  Remote: $(cd "$target_path" && git remote get-url origin)"
+    fi
+    if (cd "$target_path" && git branch --show-current > /dev/null 2>&1); then
+        echo "  Branch: $(cd "$target_path" && git branch --show-current)"
+    fi
+    
+    echo ""
+    success "Repository ready!"
+    echo ""
+    echo "Start Claude in this repository:"
+    echo "cd $target_path && claude --dangerously-skip-permissions"
+    
+    # Create worktree if requested
+    if [ -n "$current_dir" ]; then
+        echo ""
+        echo "Or return to your previous directory:"
+        echo "cd $current_dir"
+    fi
+}
+
+# Remove a cloned repository
+remove_repository() {
+    local repo_name="$1"
+    
+    if [ -z "$repo_name" ]; then
+        error "Usage: claude-clone remove <repo-name>"
+    fi
+    
+    local repo_path="/workspaces/$repo_name"
+    
+    # Check if path exists
+    if [ ! -d "$repo_path" ]; then
+        error "Repository not found: $repo_path"
+    fi
+    
+    # Check if it's a git repository
+    if [ ! -e "$repo_path/.git" ]; then
+        error "$repo_path is not a git repository"
+    fi
+    
+    # Check if it's a worktree (we shouldn't remove worktrees with this tool)
+    if [ -f "$repo_path/.git" ]; then
+        error "$repo_path appears to be a git worktree\nUse 'claude-worktree remove' instead"
+    fi
+    
+    # Check for uncommitted changes
+    if (cd "$repo_path" 2>/dev/null && [ -n "$(git status --porcelain)" ]); then
+        error "Repository has uncommitted changes\nPlease commit or stash changes first:\n  cd $repo_path\n  git status"
+    fi
+    
+    # Check for unpushed commits
+    if (cd "$repo_path" 2>/dev/null && [ -n "$(git log @{u}.. 2>/dev/null)" ]); then
+        warning "Repository has unpushed commits"
+        echo "Continue anyway? (y/N)"
+        read -r response
+        if [[ ! "$response" =~ ^[Yy]$ ]]; then
+            echo "Aborted"
+            exit 0
+        fi
+    fi
+    
+    # Remove the repository
+    info "Removing repository: $repo_path"
+    rm -rf "$repo_path"
+    
+    success "Repository removed successfully!"
+    echo ""
+    echo "Note: In VS Code, right-click the yellow (missing) folder and select 'Remove Folder from Workspace'"
+}
+
+# Show status of all repositories
+show_status() {
+    # Print header
+    printf "%-25s %-10s %-20s %-20s %s\n" "REPOSITORY" "TYPE" "REMOTE" "BRANCH" "STATUS"
+    printf "%s\n" "$(printf '%.0s-' {1..90})"
+    
+    # Iterate through directories in /workspaces
+    for dir in /workspaces/*/; do
+        [ -d "$dir" ] || continue
+        
+        local repo_name=$(basename "$dir")
+        local repo_type="unknown"
+        local remote="none"
+        local branch="unknown"
+        local status=""
+        
+        # Skip if not a git repository
+        if [ ! -e "$dir/.git" ]; then
+            continue
+        fi
+        
+        # Determine if it's a regular repo or worktree
+        if [ -f "$dir/.git" ]; then
+            repo_type="worktree"
+        elif [ -d "$dir/.git" ]; then
+            repo_type="clone"
+        fi
+        
+        # Get remote info
+        if (cd "$dir" && git remote get-url origin > /dev/null 2>&1); then
+            remote=$(cd "$dir" && git remote get-url origin)
+            # Shorten GitHub URLs
+            if [[ "$remote" =~ github\.com[:/]([^/]+)/([^/]+)(\.git)?$ ]]; then
+                remote="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
+            fi
+            # Truncate long remotes
+            if [ ${#remote} -gt 20 ]; then
+                remote="${remote:0:17}..."
+            fi
+        fi
+        
+        # Get current branch
+        if (cd "$dir" && git branch --show-current > /dev/null 2>&1); then
+            branch=$(cd "$dir" && git branch --show-current)
+            if [ ${#branch} -gt 20 ]; then
+                branch="${branch:0:17}..."
+            fi
+        fi
+        
+        # Check status
+        if (cd "$dir" 2>/dev/null); then
+            # Check for uncommitted changes
+            if [ -n "$(cd "$dir" && git status --porcelain 2>/dev/null)" ]; then
+                status="${status}modified "
+            fi
+            
+            # Check for unpushed commits
+            if [ -n "$(cd "$dir" && git log @{u}.. 2>/dev/null)" ]; then
+                status="${status}unpushed "
+            fi
+            
+            # Check if branch is behind
+            if [ -n "$(cd "$dir" && git log ..@{u} 2>/dev/null)" ]; then
+                status="${status}behind "
+            fi
+            
+            if [ -z "$status" ]; then
+                status="clean"
+            fi
+        fi
+        
+        # Truncate repo name if needed
+        if [ ${#repo_name} -gt 25 ]; then
+            repo_name="${repo_name:0:22}..."
+        fi
+        
+        # Print row
+        printf "%-25s %-10s %-20s %-20s %s\n" "$repo_name" "$repo_type" "$remote" "$branch" "$status"
+    done
+    
+    echo ""
+    info "Use 'claude-clone clone <repo>' to add more repositories"
+    info "Use 'claude-worktree create <branch>' to create worktrees"
+}
+
+# Main command handling
+case "$1" in
+    clone)
+        clone_repository "$2" "$3"
+        ;;
+    remove)
+        remove_repository "$2"
+        ;;
+    status)
+        show_status
+        ;;
+    *)
+        echo "Usage: claude-clone <command> [options]"
+        echo ""
+        echo "Commands:"
+        echo "  clone <repo> [name]     Clone a repository to /workspaces/"
+        echo "  remove <repo-name>      Remove a cloned repository"
+        echo "  status                  Show status of all repositories"
+        echo ""
+        echo "Repository formats:"
+        echo "  https://github.com/user/repo.git"
+        echo "  git@github.com:user/repo.git"
+        echo "  user/repo                    (GitHub shorthand)"
+        echo ""
+        echo "Examples:"
+        echo "  claude-clone clone anthropics/claude-code"
+        echo "  claude-clone clone user/private-repo my-project"
+        echo "  claude-clone remove my-project"
+        echo "  claude-clone status"
+        echo ""
+        echo "Note: Requires gh CLI to be installed and authenticated"
+        exit 1
+        ;;
+esac

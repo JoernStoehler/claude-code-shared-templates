@@ -1,0 +1,304 @@
+#!/bin/bash
+#
+# claude-worktree - Git worktree automation for Claude Code development
+#
+# Commands:
+#   claude-worktree create <branch-name>  - Create a new worktree
+#   claude-worktree remove <path-or-branch> - Remove a worktree
+#   claude-worktree status               - Show status of all workspaces
+#
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m' # No Color
+
+# Print error message and exit
+error() {
+    echo -e "${RED}Error: $1${NC}" >&2
+    exit 1
+}
+
+# Print warning message
+warning() {
+    echo -e "${YELLOW}Warning: $1${NC}" >&2
+}
+
+# Print success message
+success() {
+    echo -e "${GREEN}✓ $1${NC}"
+}
+
+# Check if we're in a git repository
+check_git_repo() {
+    git rev-parse --git-dir > /dev/null 2>&1 || error "Not in a git repository"
+}
+
+# Create a new worktree
+create_worktree() {
+    local branch_name="$1"
+    
+    if [ -z "$branch_name" ]; then
+        error "Usage: claude-worktree create <branch-name>"
+    fi
+    
+    # Validate we're in a git repo
+    check_git_repo
+    
+    # Check for uncommitted changes
+    if [ -n "$(git status --porcelain)" ]; then
+        error "Current working directory has uncommitted changes\nPlease commit or stash your changes first"
+    fi
+    
+    # Derive worktree path from branch name (replace / with -)
+    local worktree_name="${branch_name//\//-}"
+    local worktree_path="/workspaces/$worktree_name"
+    
+    # Check if worktree path already exists
+    if [ -d "$worktree_path" ]; then
+        error "Worktree path already exists: $worktree_path\nTo remove it: git worktree remove $worktree_path"
+    fi
+    
+    # Check if branch exists locally
+    if git rev-parse --verify "$branch_name" > /dev/null 2>&1; then
+        error "Branch '$branch_name' already exists locally\nTo use existing branch: git worktree add $worktree_path $branch_name"
+    fi
+    
+    # Check if branch exists on remote
+    if git rev-parse --verify "origin/$branch_name" > /dev/null 2>&1; then
+        error "Branch '$branch_name' already exists on remote\nTo checkout remote branch: git worktree add $worktree_path origin/$branch_name"
+    fi
+    
+    # Create the worktree
+    echo "Creating worktree at $worktree_path with branch $branch_name..."
+    git worktree add "$worktree_path" -b "$branch_name"
+    
+    # Run uv sync if pyproject.toml exists
+    if [ -f "$worktree_path/pyproject.toml" ]; then
+        echo "Setting up Python environment (installing dev dependencies)..."
+        (cd "$worktree_path" && uv sync --extra dev) || warning "uv sync failed\nYou may need to run 'uv sync --extra dev' manually"
+    fi
+    
+    # Add to VS Code workspace if code command is available
+    if command -v code > /dev/null 2>&1; then
+        echo "Adding to VS Code workspace..."
+        code --add "$worktree_path" || warning "Failed to add to VS Code workspace"
+    fi
+    
+    success "Worktree created successfully!"
+    echo ""
+    echo "Start a new agent:"
+    echo "cd $worktree_path && claude --dangerously-skip-permissions"
+}
+
+# Remove a worktree
+remove_worktree() {
+    local path_or_branch="$1"
+    
+    if [ -z "$path_or_branch" ]; then
+        error "Usage: claude-worktree remove <path-or-branch>"
+    fi
+    
+    local worktree_path=""
+    
+    # If it's not an absolute path, try to find the worktree
+    if [[ ! "$path_or_branch" =~ ^/ ]]; then
+        # Try to find by branch name
+        local branch_worktree=$(git worktree list --porcelain | grep -B2 "branch refs/heads/$path_or_branch" | grep "^worktree" | cut -d' ' -f2)
+        
+        if [ -n "$branch_worktree" ]; then
+            worktree_path="$branch_worktree"
+        else
+            # Try as directory name in /workspaces
+            local potential_path="/workspaces/$path_or_branch"
+            if [ -d "$potential_path" ]; then
+                worktree_path="$potential_path"
+            else
+                error "Could not find worktree for '$path_or_branch'"
+            fi
+        fi
+    else
+        worktree_path="$path_or_branch"
+    fi
+    
+    # Check if path exists
+    if [ ! -d "$worktree_path" ]; then
+        error "Path does not exist: $worktree_path"
+    fi
+    
+    # Check if it's actually a worktree
+    if ! git worktree list | grep -q "$worktree_path"; then
+        error "$worktree_path is not a git worktree"
+    fi
+    
+    # Check for uncommitted changes
+    if (cd "$worktree_path" 2>/dev/null && [ -n "$(git status --porcelain)" ]); then
+        error "Worktree has uncommitted changes\nPlease commit or stash changes first:\n  cd $worktree_path\n  git status"
+    fi
+    
+    # Remove the worktree
+    echo "Removing worktree: $worktree_path"
+    git worktree remove "$worktree_path"
+    
+    success "Worktree removed successfully!"
+    echo ""
+    echo "Note: In VS Code, right-click the yellow (missing) folder and select 'Remove Folder from Workspace'"
+}
+
+# Show status of all workspaces
+show_status() {
+    # Print header - compact format for 80 column terminals
+    printf "%-25s %-15s %-18s %-6s %s\n" "WORKSPACE" "REPO" "BRANCH" "CLAUDE" "ACTIVITY"
+    printf "%s\n" "--------------------------------------------------------------------------------"
+    
+    # Iterate through directories in /workspaces
+    for dir in /workspaces/*/; do
+        [ -d "$dir" ] || continue
+        
+        local workspace_name=$(basename "$dir")
+        # Shorten workspace names for 25 char column
+        if [ ${#workspace_name} -gt 25 ]; then
+            workspace_name="${workspace_name:0:22}..."
+        fi
+        local repo="unknown"
+        local branch="unknown"
+        local claude_status="✗"
+        local last_activity=""
+        
+        # Check if it's a git repository (directory) or worktree (file)
+        # Using -e instead of -d to detect both .git directories and .git files
+        if [ -e "$dir/.git" ]; then
+            # Get repository name
+            if (cd "$dir" && git remote get-url origin > /dev/null 2>&1); then
+                repo=$(cd "$dir" && git remote get-url origin | sed 's/.*\///' | sed 's/\.git$//')
+                # Show abbreviated repo names
+                # "seminar-ki-in-der-mathematik" -> "seminar-ki"
+                # "otel-cloudflare-collector" -> "otel-cf"
+                case "$repo" in
+                    seminar-ki-in-der-mathematik)
+                        repo="seminar-ki"
+                        ;;
+                    otel-cloudflare-collector)
+                        repo="otel-cf"
+                        ;;
+                    *)
+                        # Generic shortening for other repos
+                        if [ ${#repo} -gt 15 ]; then
+                            repo="${repo:0:12}..."
+                        fi
+                        ;;
+                esac
+            fi
+            
+            # Get current branch
+            if (cd "$dir" && git branch --show-current > /dev/null 2>&1); then
+                branch=$(cd "$dir" && git branch --show-current)
+                # Shorten branch names for 18 char column
+                if [ ${#branch} -gt 18 ]; then
+                    # For branches like "fix/claude-worktree-status-missing-info"
+                    # Try to show "fix/claude-work..."
+                    if [[ "$branch" =~ ^([^/]+)/(.+)$ ]]; then
+                        local prefix="${BASH_REMATCH[1]}"
+                        local suffix="${BASH_REMATCH[2]}"
+                        local remaining=$((15 - ${#prefix}))
+                        if [ $remaining -gt 3 ]; then
+                            branch="${prefix}/${suffix:0:$remaining}..."
+                        else
+                            branch="${branch:0:15}..."
+                        fi
+                    else
+                        branch="${branch:0:15}..."
+                    fi
+                fi
+            fi
+            
+            # Get last commit time and file
+            if (cd "$dir" && git log -1 --pretty=format:'%at' --name-only > /dev/null 2>&1); then
+                local last_commit=$(cd "$dir" && git log -1 --pretty=format:'%at' --name-only 2>/dev/null)
+                if [ -n "$last_commit" ]; then
+                    local timestamp=$(echo "$last_commit" | head -1)
+                    local last_file=$(echo "$last_commit" | tail -n +2 | head -1)
+                    
+                    # Convert timestamp to relative time
+                    local now=$(date +%s)
+                    local diff=$((now - timestamp))
+                    
+                    if [ $diff -lt 60 ]; then
+                        last_activity="just now"
+                    elif [ $diff -lt 3600 ]; then
+                        last_activity="$((diff / 60))m ago"
+                    elif [ $diff -lt 86400 ]; then
+                        last_activity="$((diff / 3600))h ago"
+                    else
+                        last_activity="$((diff / 86400))d ago"
+                    fi
+                    
+                    # Skip file name in compact format to save space
+                    # if [ -n "$last_file" ]; then
+                    #     # Shorten long file paths
+                    #     if [ ${#last_file} -gt 30 ]; then
+                    #         # Show just filename if path is too long
+                    #         last_file=$(basename "$last_file")
+                    #     fi
+                    #     last_activity="$last_activity ($last_file)"
+                    # fi
+                fi
+            fi
+        fi
+        
+        # Check for Claude process by examining process working directories
+        # This is more reliable than grepping ps output for directory paths
+        # Get all Claude process PIDs
+        local claude_pids=$(pgrep -x claude)
+        for pid in $claude_pids; do
+            # Check if the process's working directory matches our workspace
+            if [ -e "/proc/$pid/cwd" ] && [ "$(readlink /proc/$pid/cwd 2>/dev/null)" = "${dir%/}" ]; then
+                # Get memory usage for this process
+                local mem_kb=$(ps -p "$pid" -o rss= 2>/dev/null | tr -d ' ')
+                if [ -n "$mem_kb" ]; then
+                    # Convert KB to GB
+                    local mem_gb=$(echo "scale=1; $mem_kb / 1024 / 1024" | bc)
+                    claude_status="✓ ${mem_gb}G"
+                else
+                    claude_status="✓"
+                fi
+                break
+            fi
+        done
+        
+        # Print row - compact format
+        printf "%-25s %-15s %-18s %-6s %s\n" "$workspace_name" "$repo" "$branch" "$claude_status" "$last_activity"
+    done
+}
+
+# Main command handling
+case "$1" in
+    create)
+        create_worktree "$2"
+        ;;
+    remove)
+        remove_worktree "$2"
+        ;;
+    status)
+        show_status
+        ;;
+    *)
+        echo "Usage: claude-worktree <command> [options]"
+        echo ""
+        echo "Commands:"
+        echo "  create <branch-name>    Create a new worktree"
+        echo "  remove <path-or-branch> Remove a worktree"
+        echo "  status                  Show status of all workspaces"
+        echo ""
+        echo "Examples:"
+        echo "  claude-worktree create feat/authentication"
+        echo "  claude-worktree create fix/parser-bug"
+        echo "  claude-worktree remove feat/authentication"
+        echo "  claude-worktree remove /workspaces/feat-authentication"
+        echo "  claude-worktree status"
+        exit 1
+        ;;
+esac
