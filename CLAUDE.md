@@ -7,7 +7,7 @@ This is the entry point for Claude Code. This file is automatically read at the 
 You are working in a pre-configured development environment:
 - Current directory: Either `/workspaces/your-project-name` (main) or `/workspaces/{branch-name}` (git worktree)
 - Python environment: Active with `uv run`
-- Tools available: `rg`, `fd`, `jq`, `gh`, `git`, `make`, `claude`
+- Tools available: `rg`, `fd`, `jq`, `gh`, `git`, `make`, `claude`, `claude-worktree`, `claude-clone`
 - Setup: Script-based configuration in `.devcontainer/postCreateCommand/`
 
 Note: Small changes (docs, configs) can be done directly on main. Use worktrees for features/fixes.
@@ -18,6 +18,8 @@ Note: Small changes (docs, configs) can be done directly on main. Use worktrees 
 - @docs/claude/environment/00-overview.md - Environment overview
 - @docs/claude/environment/01-devcontainer-setup.md - Devcontainer configuration
 - @docs/claude/environment/02-secrets-and-config.md - Secrets and environment variables
+- @docs/claude/environment/03-dependency-management.md - Python dependency organization
+- @docs/claude/environment/04-telemetry-and-monitoring.md - Telemetry and process monitoring
 
 ### 🏗️ Development
 - @docs/claude/development/00-principles.md - Core development principles
@@ -64,9 +66,9 @@ git commit -m "type: message" # Conventional commit
 gh pr create                  # Create pull request
 
 # Git worktrees (parallel development)
-git worktree add /workspaces/feat-name -b feat/name
-code --add /workspaces/feat-name  # Add to VS Code
-cd /workspaces/feat-name && uv sync --all-extras
+claude-worktree create feat/name     # Automated worktree creation
+claude-worktree status              # Show all workspaces
+claude-clone clone user/repo        # Multi-repo development
 
 # Development
 make install                  # Install dependencies

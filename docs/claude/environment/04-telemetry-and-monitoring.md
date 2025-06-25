@@ -4,7 +4,7 @@ This document explains how telemetry and monitoring work in this project.
 
 ## Key Files
 
-- @/scripts/ps-monitor - The only monitoring script (self-documenting)
+- @/scripts/worktree-manager/claude-worktree - Includes process monitoring via `status` command
 - @/CLAUDE.md - Contains note about Bash() blocking behavior (search for "Bash() blocks")
 
 ## How Telemetry Works
@@ -12,8 +12,9 @@ This document explains how telemetry and monitoring work in this project.
 ### Default Configuration
 
 Claude Code automatically sends telemetry to Honeycomb:
-- `OTEL_EXPORTER_OTLP_ENDPOINT=api.eu1.honeycomb.io:443`
-- `OTEL_EXPORTER_OTLP_HEADERS=x-honeycomb-team=${HONEYCOMB_API_KEY}`
+- Auto-detects region from API key prefix (EU: `hcbik_*`, US: `hcaik_*`)
+- Sets appropriate endpoint (api.eu1.honeycomb.io or api.honeycomb.io)
+- Uses HTTP/protobuf protocol for reliable delivery
 - No local infrastructure needed
 - Works across all devcontainers and codespaces
 
@@ -29,33 +30,33 @@ Claude Code automatically sends telemetry to Honeycomb:
 
 ### Local Process Monitoring
 
-Use `ps-monitor` to see active Claude processes:
+Use `claude-worktree status` to see active Claude processes:
 
 ```bash
-./scripts/ps-monitor.py
+claude-worktree status
 ```
 
 Shows:
-- PID
-- Runtime (how long the process has been running)
-- Working directory
-- Total active sessions
-
-Press Ctrl+C to quit.
+- Workspace and branch information
+- Claude process status (✓ or ✗)
+- Memory usage for active processes
+- Last git activity
 
 **Limitations**: Cannot show request counts or token usage (use Honeycomb for that)
 
 ### Full Telemetry (Honeycomb)
 
-1. Ensure `HONEYCOMB_API_KEY` is set in your `.env`
-2. View at: https://ui.honeycomb.io/YOUR_TEAM/datasets/claude-code
+1. Ensure `HONEYCOMB_API_KEY` and `HONEYCOMB_DATASET` are set in your `.env`
+2. View at:
+   - EU: https://ui.eu1.honeycomb.io/YOUR_TEAM/environments/claude-code
+   - US: https://ui.honeycomb.io/YOUR_TEAM/environments/claude-code
 
-## The Only Script: ps-monitor
+## Process Monitoring
 
-We have exactly one monitoring script:
-- `ps-monitor` - Shows active Claude processes using `ps`
+Process monitoring is integrated into the worktree management tool:
+- `claude-worktree status` - Shows active Claude processes and their workspaces
 
-That's it. KISS principle in action.
+This follows the KISS principle by combining related functionality.
 
 ## Why This Design?
 
@@ -73,7 +74,11 @@ We deliberately keep it simple:
 
 ### No telemetry in Honeycomb
 - Check `HONEYCOMB_API_KEY` is set: `echo $HONEYCOMB_API_KEY`
+- Check `HONEYCOMB_DATASET` is set: `echo $HONEYCOMB_DATASET`
 - Verify telemetry enabled: `echo $CLAUDE_CODE_ENABLE_TELEMETRY` (should be "1")
+- Verify correct region endpoint: `echo $OTEL_EXPORTER_OTLP_ENDPOINT`
+  - EU keys (hcbik_*): should show `https://api.eu1.honeycomb.io:443`
+  - US keys (hcaik_*): should show `https://api.honeycomb.io:443`
 
 ### Monitor blocks forever
 - Don't run monitors with Bash() tool - see @/CLAUDE.md for details
@@ -82,6 +87,6 @@ We deliberately keep it simple:
 ## For New Developers
 
 1. **Quick process check**: `ps aux | grep claude`
-2. **Monitor multiple sessions**: Run `./scripts/ps-monitor` in separate terminal
+2. **Monitor multiple sessions**: Run `claude-worktree status`
 3. **Detailed metrics**: Use Honeycomb dashboard
 4. **Total learning time**: ~2 minutes
