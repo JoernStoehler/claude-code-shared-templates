@@ -88,6 +88,21 @@ This ensures:
    - Installs Quarto for document processing
    - Syncs Python dependencies with uv
 
+9. **11-setup-claude-shortcuts.sh**:
+   - Adds worktree management tools to PATH
+   - Provides bash completion for claude-worktree and claude-clone commands
+   - Enables easy git worktree automation
+
+10. **11-setup-cleaner-bash-prompt.sh**:
+    - Configures a cleaner, more readable bash prompt
+    - Shows username and path without clutter
+    - Improves terminal readability in VS Code
+
+11. **12-install-tikz-and-image-tools.sh**:
+    - Optional: Installs LaTeX/TikZ for mathematical diagrams
+    - Installs image conversion tools (ImageMagick, Inkscape)
+    - Large installation (~500MB) for specialized mathematical work
+
 ## VS Code Extensions
 
 Both profiles include essential extensions:
