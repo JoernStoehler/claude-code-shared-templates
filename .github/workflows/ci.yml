@@ -10,7 +10,7 @@ env:
   PYTHON_VERSION: "3.11"
 
 jobs:
-  lint:
+  ci:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -19,53 +19,19 @@ jobs:
       uses: astral-sh/setup-uv@v3
       with:
         enable-cache: true
-        cache-dependency-glob: "pyproject.toml"
+        cache-dependency-glob: "uv.lock"
     
     - name: Set up Python
       run: uv python install ${{ env.PYTHON_VERSION }}
     
-    - name: Install dependencies
-      run: uv sync --frozen --extra dev
+    - name: Install CI dependencies
+      run: uv sync --frozen --extra ci
     
     - name: Run ruff
       run: uv run ruff check .
-
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        enable-cache: true
-        cache-dependency-glob: "pyproject.toml"
-    
-    - name: Set up Python
-      run: uv python install ${{ env.PYTHON_VERSION }}
-    
-    - name: Install dependencies
-      run: uv sync --frozen --extra dev
     
     - name: Run pyright
       run: uv run pyright .
-
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        enable-cache: true
-        cache-dependency-glob: "pyproject.toml"
-    
-    - name: Set up Python
-      run: uv python install ${{ env.PYTHON_VERSION }}
-    
-    - name: Install dependencies
-      run: uv sync --frozen --extra dev
     
     - name: Run tests with coverage
       run: uv run pytest
@@ -78,13 +44,3 @@ jobs:
         verbose: true
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-
-  # All checks must pass
-  all-checks:
-    needs: [lint, typecheck, test]
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-    - name: Verify all checks passed
-      if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
-      run: exit 1

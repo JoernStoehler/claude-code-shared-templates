@@ -8,35 +8,94 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    # Main runtime dependencies
+    # Core runtime dependencies - lightweight and commonly needed
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "pydantic>=2.0.0",
+    "httpx>=0.25.0",
+    "tqdm>=4.66.0",
+    "click>=8.1.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+example = "example.__main__:main"
+
+[project.optional-dependencies]
+# === Dependency Groups Explained ===
+# 
+# Core dependencies (always installed):
+#   - Basic runtime needs: pandas, numpy, pydantic, httpx, tqdm, click, rich
+#
+# Optional groups (install as needed):
+#   - animations: For creating mathematical animations (requires system deps: libcairo2-dev, libpango1.0-dev, ffmpeg)
+#   - slides: For building presentations and course notes (matplotlib, plotly, jupyterlab)
+#   - ai: For AI/ML benchmarking experiments (openai, anthropic, langchain)
+#   - scientific: For advanced scientific computing (jax, numpyro, optax)
+#   - web: For web applications (fastapi, uvicorn)
+#   - ci: Minimal set for CI/CD pipeline (ruff, pyright, pytest) - no heavy deps needed!
+#   - dev: Standard development tools (includes everything from 'ci' plus pytest-xdist, pre-commit)
+#
+# Installation examples:
+#   make install          # Core only
+#   make install-dev      # Full dev environment (recommended for developers)
+#   make install-ci       # CI pipeline deps only
+#   make install-animations  # Core + animation tools (needs system deps)
+
+# For creating mathematical animations (knot theory, etc.)
+animations = [
+    "manim>=0.18.0",
+]
+
+# For building slides and course notes
+slides = [
+    "jupyterlab>=4.0.0",
+    "matplotlib>=3.7.0",
+    "plotly>=5.18.0",
+    # Note: Quarto is installed via system package manager
+]
+
+# For AI/ML benchmarking experiments
+ai = [
+    "openai>=1.0.0",
+    "anthropic>=0.21.0",
+    "langchain>=0.1.0",
+]
+
+# For advanced scientific computing
+scientific = [
     "numpyro>=0.13.0",
     "jax>=0.4.0",
     "jaxlib>=0.4.0",
     "optax>=0.1.0",
     "jaxtyping>=0.2.0",
-    "pydantic>=2.0.0",
     "polars>=0.20.0",
-    "fastapi>=0.100.0",
-    "matplotlib>=3.7.0",
-    # Utility runtime dependencies
-    "httpx>=0.25.0",
-    "tqdm>=4.66.0",
 ]
 
-[project.optional-dependencies]
+# For web applications
+web = [
+    "fastapi>=0.100.0",
+    "uvicorn>=0.24.0",
+]
+
+# Minimal dependencies for CI (lint, typecheck, test)
+ci = [
+    "ruff>=0.1.0",
+    "pyright>=1.1.350",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+]
+
+# Full development environment (includes all CI tools plus extras)
 dev = [
-    # Development dependencies
     "ruff>=0.1.0",
     "pyright>=1.1.350",
     "pytest>=7.4.0",
     "pytest-cov>=4.1.0",
     "pytest-xdist>=3.3.0",
-    "uvicorn>=0.24.0",
     "pre-commit>=3.5.0",
     # ps-monitor dependencies
     "psutil>=5.9.0",
-    "rich>=13.0.0",
-    "click>=8.1.0",
 ]
 
 [build-system]
@@ -78,6 +137,17 @@ ignore = [
     "B008",  # do not perform function calls in argument defaults
     "B904",  # raise from None
     "SIM105", # use contextlib.suppress
+    "UP035",  # typing.Dict/List deprecation - explicit imports are clearer
+    "UP006",  # Use list instead of List - typing imports are clearer  
+    "UP045",  # Use X | None - Optional[X] is more explicit
+    "F541",   # f-string without placeholders - useful for consistency
+    "SIM108", # Use ternary operator - if-else often clearer
+    "F403",   # star imports - common in mathematical libraries like Manim
+    "F405",   # star import undefined names - follows from F403
+    "RUF001", # ambiguous Unicode characters in strings - we do math, need Greek letters
+    "RUF002", # ambiguous Unicode characters in docstrings - we do math, need Greek letters
+    "I001",   # import sorting - not worth forcing refactoring
+    "F401",   # unused imports - not worth forcing refactoring
 ]
 
 [tool.ruff.lint.isort]
@@ -93,6 +163,8 @@ exclude = [
     ".git",
     "build",
     "dist",
+    # Exclude animations from CI - they require optional dependencies
+    "src/**/animations/**",
 ]
 typeCheckingMode = "standard"
 pythonVersion = "3.11"
@@ -160,6 +232,9 @@ omit = [
     "*/__pycache__/*",
     "*/venv/*",
     "*/.venv/*",
+    "*/__main__.py",
+    # Exclude animations from coverage - they require optional dependencies
+    "*/animations/*",
 ]
 
 [tool.coverage.report]

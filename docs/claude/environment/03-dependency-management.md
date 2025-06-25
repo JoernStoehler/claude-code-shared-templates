@@ -20,7 +20,7 @@ This project uses a modular dependency structure to optimize CI/CD performance a
 #### `animations` - Mathematical Animations
 - **manim**: Create mathematical animations (knot theory, transformations)
 - **System requirements**: libcairo2-dev, libpango1.0-dev, ffmpeg
-- **Install**: `uv sync --extra animations`
+- **Install**: `make install-animations`
 - **Use case**: Creating visual demonstrations for presentations
 
 #### `slides` - Presentation Tools
@@ -28,60 +28,102 @@ This project uses a modular dependency structure to optimize CI/CD performance a
 - **matplotlib**: Static plotting and figures
 - **plotly**: Interactive visualizations
 - **Note**: Quarto installed separately via system package
-- **Install**: `uv sync --extra slides`
+- **Install**: `make install-slides`
 - **Use case**: Building course materials and slides
 
 #### `ai` - AI/ML Integration
 - **openai**: OpenAI API client
 - **anthropic**: Anthropic (Claude) API client
 - **langchain**: LLM application framework
-- **Install**: `uv sync --extra ai`
+- **Install**: `make install-ai`
 - **Use case**: AI benchmarking and experiments
+
+#### `scientific` - Advanced Scientific Computing
+- **numpyro**: Probabilistic programming with JAX
+- **jax**: High-performance numerical computing
+- **jaxlib**: JAX backend library
+- **optax**: Gradient processing and optimization
+- **jaxtyping**: Type annotations for JAX arrays
+- **polars**: Fast DataFrame library
+- **Install**: `make install-scientific`
+- **Use case**: Advanced mathematical modeling and computation
+
+#### `web` - Web Applications
+- **fastapi**: Modern web framework
+- **uvicorn**: ASGI server
+- **Install**: `make install-web`
+- **Use case**: Building REST APIs and web services
 
 #### `ci` - CI/CD Minimal Set
 - **ruff**: Fast Python linter
 - **pyright**: Type checker
 - **pytest**: Testing framework
 - **pytest-cov**: Coverage reporting
-- **Install**: `uv sync --extra ci`
+- **Install**: `make install-ci`
 - **Use case**: GitHub Actions CI pipeline (minimal deps for speed)
 
 #### `dev` - Full Development
 - Everything from `ci` plus:
 - **pytest-xdist**: Parallel test execution
 - **pre-commit**: Git hook framework
-- **Install**: `uv sync --extra dev`
+- **psutil**: Process monitoring (for ps-monitor script)
+- **Install**: `make install-dev`
 - **Use case**: Local development environment
 
 ## Installation Commands
 
 ```bash
-# Install all dependencies (currently installs all dev dependencies)
+# Core dependencies only (minimal)
 make install
 
-# Specific dependency groups (requires pyproject.toml configuration)
-uv sync --extra dev        # Full development environment
-uv sync --extra animations # For manim animations
-uv sync --extra slides     # For presentations  
-uv sync --extra ai         # For AI experiments
-uv sync --extra ci         # CI environment (minimal)
+# Full development environment (recommended for developers)
+make install-dev
+
+# Specific dependency groups
+make install-animations  # For manim animations
+make install-slides     # For presentations  
+make install-ai         # For AI experiments
+make install-scientific # For advanced scientific computing
+make install-web        # For web applications
+make install-ci         # CI environment (minimal)
+
+# Direct uv commands (alternative)
+uv sync --frozen --extra dev        # Full development environment
+uv sync --frozen --extra animations # For manim animations
+uv sync --frozen --extra slides     # For presentations  
+uv sync --frozen --extra ai         # For AI experiments
+uv sync --frozen --extra scientific # For scientific computing
+uv sync --frozen --extra web        # For web applications
+uv sync --frozen --extra ci         # CI environment (minimal)
 ```
 
 ## Common Scenarios
 
 ### New Developer Setup
-The devcontainer automatically runs `uv sync --extra dev`, giving you everything needed for development.
+The devcontainer automatically runs `make install-dev`, giving you everything needed for development.
 
 ### Working on Animations
 If you see `ModuleNotFoundError: No module named 'manim'`:
 ```bash
-uv sync --extra animations
+make install-animations
 ```
 
 ### Creating Presentations
 If you see `ModuleNotFoundError: No module named 'matplotlib'`:
 ```bash
-uv sync --extra slides
+make install-slides
+```
+
+### Advanced Scientific Computing
+If you need JAX, NumPyro, or Polars:
+```bash
+make install-scientific
+```
+
+### Building Web Applications
+If you need FastAPI or Uvicorn:
+```bash
+make install-web
 ```
 
 ### CI/CD Pipeline
@@ -108,7 +150,7 @@ Quarto is installed separately in the devcontainer setup. For manual installatio
 ### Import Errors
 If you get import errors, check which dependency group contains the package:
 1. Look in `pyproject.toml` under `[project.optional-dependencies]`
-2. Install the appropriate group with `uv sync --extra <group>`
+2. Install the appropriate group with `make install-<group>`
 
 ### CI Failures
 CI uses minimal dependencies. If CI fails but local tests pass:
